@@ -14,10 +14,8 @@ Proiect la Ingineria Programării, @TUIAȘI
     * Open project
     * Add / create file
     * Discover existing files
-
-  * Florea - copy paspte redo undo
-    * Două butoane
-    * Per tab
+  * Florea - Elemente editor
+    * Copy, paste, redo, undo
     * Meniu contextual (copy, paste, delete, cut...)
     * Shortcuts
   * Miron - sintax higlighting / warning errors
