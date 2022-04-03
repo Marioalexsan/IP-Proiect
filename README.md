@@ -23,7 +23,7 @@ Proiect la Ingineria Programării, @TUIAȘI
     * Elemente de la materia LFT
     * Nice to have: warnings / errors în timpul editării
     * Must have: warnings / errors at build time
-  * Robert - build script:
+  * Țuțuianu - build script:
     * Buton build / rebuild
     * Buton run
     * Elemente de redirectare consolă, output compilator
