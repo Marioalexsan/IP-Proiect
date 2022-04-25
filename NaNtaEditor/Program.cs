@@ -12,9 +12,6 @@ namespace NaNtaEditor
         [STAThread]
         static void Main()
         {
-            var lexerTest = Tokenizer.Tokenize(Resources.sampleSource2);
-
-
             ApplicationConfiguration.Initialize();
 
             Form splashScreen = new SplashScreenForm();

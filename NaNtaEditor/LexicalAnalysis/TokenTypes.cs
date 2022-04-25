@@ -8,15 +8,17 @@ namespace Editor.LexicalAnalysis;
 
 internal enum TokenTypes
 {
+    WhiteSpace = -3,
+    Comment = -2,
     Invalid = -1,
     Unrecognized = 0,
     Keyword,
     Identifier,
     NumericLiteral,
+    FloatLiteral,
     BooleanLiteral,
     PointerLiteral,
     StringLiteral,
     CharacterLiteral,
-    Punctuator,
-    Comment
+    Punctuator
 }
