@@ -40,10 +40,19 @@ namespace Editor.Forms
         {
             return tokenType switch
             {
-                TokenTypes.Keyword => Color.Blue,
-                TokenTypes.CharacterLiteral => Color.Yellow,
+                TokenTypes.WhiteSpace => Color.White,
                 TokenTypes.Comment => Color.Green,
-                TokenTypes.StringLiteral => Color.Orange,
+                TokenTypes.Invalid => Color.White,
+                TokenTypes.Unrecognized => Color.White,
+                TokenTypes.Keyword => Color.Blue,
+                TokenTypes.Identifier => Color.DarkGray,
+                TokenTypes.IntegerLiteral => Color.DarkViolet,
+                TokenTypes.FloatLiteral => Color.DarkViolet,
+                TokenTypes.BooleanLiteral => Color.Blue,
+                TokenTypes.PointerLiteral => Color.Blue,
+                TokenTypes.StringLiteral => Color.LightGreen,
+                TokenTypes.CharacterLiteral => Color.LightGreen,
+                TokenTypes.Punctuator => Color.Black,
                 _ => Color.Black
             };
         }
@@ -52,6 +61,19 @@ namespace Editor.Forms
         {
             return tokenType switch
             {
+                TokenTypes.WhiteSpace => Color.White,
+                TokenTypes.Comment => Color.White,
+                TokenTypes.Invalid => Color.Red,
+                TokenTypes.Unrecognized => Color.Red,
+                TokenTypes.Keyword => Color.White,
+                TokenTypes.Identifier => Color.White,
+                TokenTypes.IntegerLiteral => Color.White,
+                TokenTypes.FloatLiteral => Color.White,
+                TokenTypes.BooleanLiteral => Color.White,
+                TokenTypes.PointerLiteral => Color.White,
+                TokenTypes.StringLiteral => Color.White,
+                TokenTypes.CharacterLiteral => Color.White,
+                TokenTypes.Punctuator => Color.White,
                 _ => Color.White
             };
         }

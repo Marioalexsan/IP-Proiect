@@ -136,9 +136,10 @@
             // 
             // editAreaRichTextBox
             // 
-            this.editAreaRichTextBox.Location = new System.Drawing.Point(12, 27);
+            this.editAreaRichTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.editAreaRichTextBox.Location = new System.Drawing.Point(0, 24);
             this.editAreaRichTextBox.Name = "editAreaRichTextBox";
-            this.editAreaRichTextBox.Size = new System.Drawing.Size(776, 411);
+            this.editAreaRichTextBox.Size = new System.Drawing.Size(800, 426);
             this.editAreaRichTextBox.TabIndex = 1;
             this.editAreaRichTextBox.Text = "";
             // 

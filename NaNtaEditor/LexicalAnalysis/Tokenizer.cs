@@ -20,14 +20,20 @@ internal static class Tokenizer
             Token? token = null;
 
             token ??= CheckComment(stringView);
-            token ??= CheckKeyword(stringView);
             token ??= CheckIntegerLiteral(stringView);
+            token ??= CheckFloatLiteral(stringView);
             token ??= CheckStringLiteral(stringView);
             token ??= CheckCharacterLiteral(stringView);
+            token ??= CheckBooleanLiteral(stringView);
+            token ??= CheckPointerLiteral(stringView);
+            token ??= CheckKeyword(stringView);
             token ??= CheckPunctuator(stringView);
             token ??= CheckIdentifier(stringView);
 
+            // TODO: Refactor Token to contain the source code position
             token ??= ConsumeWhiteSpace(stringView);
+
+            // If this branch gets hit, it means that the lexer sucks
             token ??= new Token(TokenTypes.Unrecognized, stringView[0].ToString(), 1);
 
             tokenList.Add(token);
@@ -69,17 +75,26 @@ internal static class Tokenizer
 
     private static Token? CheckStringLiteral(ReadOnlySpan<char> source)
     {
+        if (source.Length < 2)
+            return null;
+
         if (source[0] != '"')
             return null;
 
         int index = 1;
-        while (index < source.Length && (source[index] != '"' || source[index - 1] == '\\'))
+
+        while (index < source.Length && source[index] != '"')
         {
+            if (source[index] == '\\' && index + 1 < source.Length)
+            {
+                index++;
+            }
+
             index++;
         }
 
-        if (source[index] != '"')
-            return new Token(TokenTypes.Invalid, source[1..index].ToString(), index + 1);
+        if (index >= source.Length)
+            return new Token(TokenTypes.Invalid, source[1..index].ToString(), source.Length);
 
         return new Token(TokenTypes.StringLiteral, source[1..index].ToString(), index + 1);
     }
@@ -90,48 +105,184 @@ internal static class Tokenizer
             return null;
 
         int index = 1;
-        while (index < source.Length && (source[index] != '\'' || source[index - 1] == '\\'))
+        while (index < source.Length && source[index] != '\'')
         {
+            if (source[index] == '\\' && index + 1 < source.Length)
+            {
+                index++;
+            }
+
             index++;
         }
 
-        if (source[index] != '\'' || index != 2)
-            return new Token(TokenTypes.Invalid, source[1..index].ToString(), index + 1);
+        if (index >= source.Length)
+            return new Token(TokenTypes.Invalid, source[1..index].ToString(), source.Length);
 
-        return new Token(TokenTypes.CharacterLiteral, source[1], 3);
+        return new Token(TokenTypes.CharacterLiteral, source[1], index + 1);
     }
 
-    /*
     private static Token? CheckFloatLiteral(ReadOnlySpan<char> source)
     {
         bool erroneous = false;
-        int start = 0;
         int index = 0;
 
-        bool digitBefore = false;
-        bool digitAfter = false;
-        bool exponent = false;
-        bool suffix = false;
+        bool gotInteger = false;
+        bool gotDelimiter = false;
+        bool gotFraction = false;
+        bool gotExponent = false;
+        bool gotSuffix = false;
+
+        if (source[index] == '-' || source[index] == '+')
+            index++;
 
         // Hexadecimal style
         if (source.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase))
         {
+            // Read digit sequence 1 (integer)
+            while (index < source.Length && CppStuff.IsHexaDigit(source[index]))
+            {
+                gotInteger = true;
+                index++;
+            }
 
+            // Check for delimiter
+            if (index < source.Length && source[index] == '.')
+            {
+                gotDelimiter = true;
+                index++;
+            }
+
+            // Read digit sequence 2 (fraction)
+            if (gotDelimiter)
+            {
+                while (index < source.Length && CppStuff.IsHexaDigit(source[index]))
+                {
+                    gotFraction = true;
+                    index++;
+                }
+            }
+
+            // Read decimal exponent
+            if (char.ToLowerInvariant(source[index]) == 'p')
+            {
+                index++;
+
+                if (source[index] == '-' || source[index] == '+')
+                    index++;
+
+                // I think the digits in the exponent remain as decimal
+                while (index < source.Length && char.IsDigit(source[index]))
+                {
+                    gotExponent = true;
+                    index++;
+                }
+            }
+
+            // Read suffix
+            if ((gotExponent || gotDelimiter) && index < source.Length)
+            {
+                char suffix = char.ToLowerInvariant(source[index]);
+                if (suffix == 'l' || suffix == 'f')
+                {
+                    gotSuffix = true;
+                    index++;
+                }
+            }
+
+            // If this check fails, it can't be considered as a float literal at all
+            if (!(gotDelimiter || gotFraction || gotExponent || gotSuffix))
+                return null;
+
+            // Exponent is never optional for hex floats
+            erroneous =
+                !(gotInteger && gotExponent ||
+                gotInteger && gotDelimiter && gotExponent ||
+                gotDelimiter && gotExponent);
+
+
+            if (erroneous)
+                return new Token(TokenTypes.Invalid, source[..index].ToString(), index + 1);
+
+            return new Token(TokenTypes.FloatLiteral, source[..index].ToString(), index + 1);
         }
 
         // Decimal style
         else
         {
+            // Read digit sequence 1
+            while (index < source.Length && char.IsDigit(source[index]))
+            {
+                gotInteger = true;
+                index++;
+            }
 
+            // Check for delimiter
+            if (index < source.Length && source[index] == '.')
+            {
+                gotDelimiter = true;
+                index++;
+            }
+
+            // Read digit sequence 2
+            if (gotDelimiter)
+            {
+                while (index < source.Length && char.IsDigit(source[index]))
+                {
+                    gotFraction = true;
+                    index++;
+                }
+            }
+
+            // Read decimal exponent
+            if (char.ToLowerInvariant(source[index]) == 'e')
+            {
+                index++;
+
+                if (source[index] == '-' || source[index] == '+')
+                    index++;
+
+                while (index < source.Length && char.IsDigit(source[index]))
+                {
+                    gotExponent = true;
+                    index++;
+                }
+            }
+
+            // Read suffix
+            if ((gotExponent || gotDelimiter) && index < source.Length)
+            {
+                char suffix = char.ToLowerInvariant(source[index]);
+                if (suffix == 'l' || suffix == 'f')
+                {
+                    gotSuffix = true;
+                    index++;
+                }
+            }
+
+            // If this check fails, it can't be considered as a float literal at all
+            if (!(gotDelimiter || gotFraction || gotExponent || gotSuffix))
+                return null;
+
+            erroneous =
+                !(gotInteger && gotExponent ||
+                gotInteger && gotDelimiter ||
+                gotDelimiter && gotExponent);
+
+            if (erroneous)
+                return new Token(TokenTypes.Invalid, source[..index].ToString(), index + 1);
+
+            return new Token(TokenTypes.FloatLiteral, source[..index].ToString(), index + 1);
         }
     }
-    */
-
+    
     private static Token? CheckIntegerLiteral(ReadOnlySpan<char> source)
     {
         bool erroneous = false;
         int start = 0;
         int index = 0;
+
+        if (source[0] == '-' || source[0] == '+')
+            index++;
 
         // Hexadecimal literal
         if (source.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase))
@@ -154,9 +305,9 @@ internal static class Tokenizer
         }
 
         // Octal literal
-        else if (source[0] == '0')
+        else if (source.StartsWith("0"))
         {
-            start = 1;
+            index++;
             for (index = start; index < source.Length && CppStuff.IsOctalDigit(source[index]); index++)
             {
                 // Nothing
@@ -214,7 +365,7 @@ internal static class Tokenizer
         }
 
         if (!erroneous)
-            return new Token(TokenTypes.NumericLiteral, source[0..index].ToString(), index + 1);
+            return new Token(TokenTypes.IntegerLiteral, source[0..index].ToString(), index + 1);
 
         return new Token(TokenTypes.Invalid, source[0..index].ToString(), index + 1);
     }

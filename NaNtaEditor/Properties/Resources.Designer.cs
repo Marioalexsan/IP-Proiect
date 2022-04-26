@@ -71,48 +71,33 @@ namespace Editor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to // A simple Lexer meant to demonstrate a few theoretical concepts. It can
-        ///// support several parser concepts and is very fast (though speed is not its
-        ///// design goal).
-        /////
-        ///// J. Arrieta, Nabla Zero Labs
-        /////
-        ///// This code is released under the MIT License.
-        /////
-        ///// Copyright 2018 Nabla Zero Labs
-        /////
-        ///// Permission is hereby granted, free of charge, to any person obtaining a copy
-        ///// of this software and associated documentation files(the &quot;Software&quot;), to deal
-        ///// in the Software without restriction, includi [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string sampleSource {
-            get {
-                return ResourceManager.GetString("sampleSource", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to #include &quot;speech.h&quot;
+        ///   Looks up a localized string similar to #include &lt;iostream&gt;
+        ///using std::cout;
         ///
-        ///#include &lt;map&gt;
-        ///#include &lt;set&gt;
-        ///#include &lt;string&gt;
-        ///#include &lt;utility&gt;
-        ///#include &lt;vector&gt;
-        ///
-        ///#include &quot;json.h&quot;
-        ///#include &quot;rng.h&quot;
-        ///
-        ///static std::map&lt;std::string, std::vector&lt;SpeechBubble&gt;&gt; speech;
-        ///
-        ///static SpeechBubble nullSpeech = { no_translation( &quot;INVALID SPEECH&quot; ), 0 };
-        ///
-        ///void load_speech( const JsonObject &amp;jo )
+        ///int main()
         ///{
-        ///    translation sound;
-        ///    jo.read( &quot;sound&quot;, sound );
-        ///    const int volume = jo.get_int( &quot;volume&quot; );
-        ///    for( const std::string &amp;label : jo.get_tags( &quot;speaker&quot; ) )  [rest of string was truncated]&quot;;.
+        ///    /* Here is a
+        ///        //*Big
+        ///        //*Comment
+        ///        //*Block
+        ///    */
+        ///    
+        ///    // Pointer literal
+        ///    int* pointer_int = nullptr;
+        ///    
+        ///    // Boolean literals
+        ///    bool is_true = true;
+        ///    bool is_false = false;
+        ///
+        ///    // String and character literal
+        ///    cout &lt;&lt; &quot;Hello World&quot; &lt;&lt;&apos;!&apos; &lt;&lt; &apos;\n&apos;;
+        ///    
+        ///    // Some integer literals
+        ///    cout &lt;&lt; 123    &lt;&lt; &apos;\n&apos;
+        ///         &lt;&lt; 0123   &lt;&lt; &apos;\n&apos;
+        ///         &lt;&lt; 0x123  &lt;&lt; &apos;\n&apos;
+        ///         &lt;&lt; 0b10   &lt;&lt; &apos;\n&apos;
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string sampleSource2 {
             get {

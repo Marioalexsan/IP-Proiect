@@ -14,7 +14,7 @@ internal enum TokenTypes
     Unrecognized = 0,
     Keyword,
     Identifier,
-    NumericLiteral,
+    IntegerLiteral,
     FloatLiteral,
     BooleanLiteral,
     PointerLiteral,
