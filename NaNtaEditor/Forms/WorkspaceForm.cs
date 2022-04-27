@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -24,12 +25,19 @@ namespace Editor.Forms
 
             foreach (Token token in lexerTest)
             {
-                int nextIndex = index + token.SourceLength;
+                int nextIndex = index + token.Length;
 
-                editAreaRichTextBox.SelectionColor = GetForegroundColor(token.TokenType);
-                editAreaRichTextBox.SelectionBackColor = GetBackgroundColor(token.TokenType);
+                //editAreaRichTextBox.SelectionColor = GetForegroundColor(token.TokenType);
+                //editAreaRichTextBox.SelectionBackColor = GetBackgroundColor(token.TokenType);
+                editAreaRichTextBox.SelectionFont = new Font(FontFamily.GenericMonospace, 12, token.IsValid ? FontStyle.Regular : FontStyle.Strikeout);
+
+                Color foreColor = editAreaRichTextBox.SelectionColor = GetForegroundColor(token.TokenType);
+                editAreaRichTextBox.SelectionBackColor = Color.FromArgb((byte)~foreColor.R, (byte)~foreColor.G, (byte)~foreColor.B);
+
 
                 editAreaRichTextBox.AppendText(Resources.sampleSource2[index..nextIndex]);
+
+                Debug.WriteLine(token);
 
                 index = nextIndex;
             }
@@ -46,7 +54,7 @@ namespace Editor.Forms
                 TokenTypes.Unrecognized => Color.White,
                 TokenTypes.Keyword => Color.Blue,
                 TokenTypes.Identifier => Color.DarkGray,
-                TokenTypes.IntegerLiteral => Color.DarkViolet,
+                TokenTypes.IntegerLiteral => Color.LightBlue,
                 TokenTypes.FloatLiteral => Color.DarkViolet,
                 TokenTypes.BooleanLiteral => Color.Blue,
                 TokenTypes.PointerLiteral => Color.Blue,

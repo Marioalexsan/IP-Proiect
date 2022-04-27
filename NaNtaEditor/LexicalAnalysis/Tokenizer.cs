@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Editor.LexicalAnalysis;
 
+/// <summary>
+/// Tokenizer class.
+/// Takes *raw* source code as input.
+/// </summary>
 internal static class Tokenizer
 {
     public static List<Token> Tokenize(string input)
@@ -20,8 +24,8 @@ internal static class Tokenizer
             Token? token = null;
 
             token ??= CheckComment(stringView);
-            token ??= CheckIntegerLiteral(stringView);
             token ??= CheckFloatLiteral(stringView);
+            token ??= CheckIntegerLiteral(stringView);
             token ??= CheckStringLiteral(stringView);
             token ??= CheckCharacterLiteral(stringView);
             token ??= CheckBooleanLiteral(stringView);
@@ -37,7 +41,7 @@ internal static class Tokenizer
             token ??= new Token(TokenTypes.Unrecognized, stringView[0].ToString(), 1);
 
             tokenList.Add(token);
-            start += token.SourceLength;
+            start += token.Length;
         }
 
         return tokenList;
@@ -45,80 +49,75 @@ internal static class Tokenizer
 
     private static Token? ConsumeWhiteSpace(ReadOnlySpan<char> source)
     {
-        if (!char.IsWhiteSpace(source[0]))
+        if (source.Length == 0)
             return null;
 
-        int end = 1;
-        while (end < source.Length && char.IsWhiteSpace(source[end]))
+        int index = 0;
+
+        while (index < source.Length && char.IsWhiteSpace(source[index]))
         {
-            end++;
+            index++;
         }
 
-        return new Token(TokenTypes.WhiteSpace, source[..end].ToString(), end);
+        return new Token(TokenTypes.WhiteSpace, null, index);
     }
 
     private static Token? CheckBooleanLiteral(ReadOnlySpan<char> source)
     {
-        if (source == "true" || source == "false")
-            return new Token(TokenTypes.BooleanLiteral, source == "true", source.Length);
+        if (source != "true" && source != "false")
+            return null;
 
-        return null;
+        return new Token(TokenTypes.BooleanLiteral, source[0] == 't', source.Length);
     }
 
     private static Token? CheckPointerLiteral(ReadOnlySpan<char> source)
     {
-        if (source == "nullptr")
-            return new Token(TokenTypes.PointerLiteral, 0, source.Length);
+        if (source != "nullptr")
+            return null;
 
-        return null;
+        return new Token(TokenTypes.PointerLiteral, null, source.Length);
     }
 
     private static Token? CheckStringLiteral(ReadOnlySpan<char> source)
     {
-        if (source.Length < 2)
-            return null;
-
-        if (source[0] != '"')
+        if (source.Length == 0 || source[0] != '"')
             return null;
 
         int index = 1;
 
         while (index < source.Length && source[index] != '"')
         {
+            // Escape next character if applicable
             if (source[index] == '\\' && index + 1 < source.Length)
-            {
                 index++;
-            }
 
+            // Apply current character
             index++;
         }
 
-        if (index >= source.Length)
-            return new Token(TokenTypes.Invalid, source[1..index].ToString(), source.Length);
-
-        return new Token(TokenTypes.StringLiteral, source[1..index].ToString(), index + 1);
+        return new Token(TokenTypes.StringLiteral, source[1..index].ToString(), index + 1, index < source.Length);
     }
 
     private static Token? CheckCharacterLiteral(ReadOnlySpan<char> source)
     {
-        if (source[0] != '\'')
+        if (source.Length == 0 || source[0] != '\'')
             return null;
 
         int index = 1;
+        int characterCount = 0;
+
         while (index < source.Length && source[index] != '\'')
         {
-            if (source[index] == '\\' && index + 1 < source.Length)
-            {
+            // Escape next character if applicable
+            if (source[index] == '\\')
                 index++;
-            }
 
+            // Apply current character
             index++;
+            characterCount++;
         }
 
-        if (index >= source.Length)
-            return new Token(TokenTypes.Invalid, source[1..index].ToString(), source.Length);
-
-        return new Token(TokenTypes.CharacterLiteral, source[1], index + 1);
+        return new Token(TokenTypes.CharacterLiteral, source[1], index + 1, characterCount == 1 && index < source.Length);
     }
 
     private static Token? CheckFloatLiteral(ReadOnlySpan<char> source)
@@ -138,8 +137,10 @@ internal static class Tokenizer
         // Hexadecimal style
         if (source.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase))
         {
+            index += 2;
+
             // Read digit sequence 1 (integer)
-            while (index < source.Length && CppStuff.IsHexaDigit(source[index]))
+            while (index < source.Length && (CppStuff.IsHexaDigit(source[index]) || source[index] == '\''))
             {
                 gotInteger = true;
                 index++;
@@ -155,7 +156,7 @@ internal static class Tokenizer
             // Read digit sequence 2 (fraction)
             if (gotDelimiter)
             {
-                while (index < source.Length && CppStuff.IsHexaDigit(source[index]))
+                while (index < source.Length && (CppStuff.IsHexaDigit(source[index]) || source[index] == '\''))
                 {
                     gotFraction = true;
                     index++;
@@ -171,7 +172,7 @@ internal static class Tokenizer
                     index++;
 
                 // I think the digits in the exponent remain as decimal
-                while (index < source.Length && char.IsDigit(source[index]))
+                while (index < source.Length && (char.IsDigit(source[index]) || source[index] == '\''))
                 {
                     gotExponent = true;
                     index++;
@@ -199,18 +200,33 @@ internal static class Tokenizer
                 gotInteger && gotDelimiter && gotExponent ||
                 gotDelimiter && gotExponent);
 
+            // Single quotes between two digits are allowed, everything else is an error
+            for (int i = 0; i < index; i++)
+            {
+                if (source[index] == '\'')
+                {
+                    if (i != 0 && !CppStuff.IsHexaDigit(source[index - 1]))
+                    {
+                        erroneous = true;
+                        break;
+                    }
 
-            if (erroneous)
-                return new Token(TokenTypes.Invalid, source[..index].ToString(), index + 1);
+                    if (i + 1 < index && !CppStuff.IsHexaDigit(source[index + 1]))
+                    {
+                        erroneous = true;
+                        break;
+                    }
+                }
+            }
 
-            return new Token(TokenTypes.FloatLiteral, source[..index].ToString(), index + 1);
+            return new Token(TokenTypes.FloatLiteral, source[..index].ToString(), index, !erroneous);
         }
 
         // Decimal style
-        else
+        else if (char.IsDigit(source[0]) || source[0] == '.')
         {
             // Read digit sequence 1
-            while (index < source.Length && char.IsDigit(source[index]))
+            while (index < source.Length && (char.IsDigit(source[index]) || source[index] == '\''))
             {
                 gotInteger = true;
                 index++;
@@ -226,7 +242,7 @@ internal static class Tokenizer
             // Read digit sequence 2
             if (gotDelimiter)
             {
-                while (index < source.Length && char.IsDigit(source[index]))
+                while (index < source.Length && (char.IsDigit(source[index]) || source[index] == '\''))
                 {
                     gotFraction = true;
                     index++;
@@ -241,7 +257,7 @@ internal static class Tokenizer
                 if (source[index] == '-' || source[index] == '+')
                     index++;
 
-                while (index < source.Length && char.IsDigit(source[index]))
+                while (index < source.Length && (char.IsDigit(source[index]) || source[index] == '\''))
                 {
                     gotExponent = true;
                     index++;
@@ -268,10 +284,32 @@ internal static class Tokenizer
                 gotInteger && gotDelimiter ||
                 gotDelimiter && gotExponent);
 
-            if (erroneous)
-                return new Token(TokenTypes.Invalid, source[..index].ToString(), index + 1);
+            // Single quotes between two digits are allowed, everything else is an error
+            for (int i = 0; i < index; i++)
+            {
+                if (source[index] == '\'')
+                {
+                    if (i != 0 && !char.IsDigit(source[index - 1]))
+                    {
+                        erroneous = true;
+                        break;
+                    }
 
-            return new Token(TokenTypes.FloatLiteral, source[..index].ToString(), index + 1);
+                    if (i + 1 < index && !char.IsDigit(source[index + 1]))
+                    {
+                        erroneous = true;
+                        break;
+                    }
+                }
+            }
+
+            return new Token(TokenTypes.FloatLiteral, source[..index].ToString(), index, !erroneous);
+        }
+
+        // Uhhhhh
+        else
+        {
+            return null;
         }
     }
     
@@ -338,85 +376,99 @@ internal static class Tokenizer
         {
             int charsLeft = source.Length - index;
 
+            // unsigned int
             if (charsLeft >= 1 && char.ToLowerInvariant(source[index]) == 'u')
             {
                 erroneous = erroneous || usedSign;
                 usedSign = true;
                 index++;
             }
+
+            // long long int
+            else if (charsLeft >= 2 && source[index..(index + 2)].ToString().ToLowerInvariant() == "ll" && source[index] == source[index + 1])
+            {
+                erroneous = erroneous || usedSize;
+                usedSize = true;
+                index += 2;
+            }
+
+            // long int
+            // This branch must be after `ll` otherwise it picks up the first `l` from long long
             else if (charsLeft >= 1 && char.ToLowerInvariant(source[index]) == 'l')
             {
                 erroneous = erroneous || usedSize;
                 usedSize = true;
                 index++;
             }
+
+            // std::size_t
             else if (charsLeft >= 1 && char.ToLowerInvariant(source[index]) == 'z')
             {
                 erroneous = erroneous || usedSize;
                 usedSize = true;
                 index++;
             }
-            else if (charsLeft >= 2 && source[index..(index+2)].ToString().ToLowerInvariant() == "ll" && source[index] == source[index + 1])
-            {
-                erroneous = erroneous || usedSize;
-                usedSize = true;
-                index += 2;
-            }
         }
 
         if (!erroneous)
-            return new Token(TokenTypes.IntegerLiteral, source[0..index].ToString(), index + 1);
+            return new Token(TokenTypes.IntegerLiteral, source[0..index].ToString(), index);
 
-        return new Token(TokenTypes.Invalid, source[0..index].ToString(), index + 1);
+        return new Token(TokenTypes.Invalid, source[0..index].ToString(), index);
     }
 
     private static Token? CheckIdentifier(ReadOnlySpan<char> source)
     {
-        if ('0' <= source[0] && source[0] <= '9')
+        if (source.Length == 0 || char.IsDigit(source[0]) || !CppStuff.IsIdentifierCharacter(source[0]))
             return null;  // Cannot start with a digit
 
-        if (!CppStuff.IsIdentifierCharacter(source[0]))
-            return null;
+        int index = 1;
 
-        for (int index = 1; index < source.Length; index++)
+        while (index < source.Length && CppStuff.IsIdentifierCharacter(source[index]))
         {
-            if (!CppStuff.IsIdentifierCharacter(source[index]))
-            {
-                return new Token(TokenTypes.Identifier, source[..index].ToString(), index);
-            }
+            index++;
         }
 
-        return new Token(TokenTypes.Identifier, source.ToString(), source.Length);
+        return new Token(TokenTypes.Identifier, source[..index].ToString(), index);
     }
 
     private static Token? CheckComment(ReadOnlySpan<char> source)
     {
+        int end = 2;
+        int commentEnd;
+
         if (source.StartsWith("//"))
         {
-            for (int index = 2; index < source.Length; index++)
-            {
-                if (source[index] == '\n')
-                {
-                    int end = source[index - 1] == '\r' ? index - 1 : index;
+            commentEnd = source.IndexOf('\n');
+            end = commentEnd + 1;
 
-                    return new Token(TokenTypes.Comment, source[2..end].ToString(), index + 1);
-                }
+            if (commentEnd == -1)
+            {
+                commentEnd = source.Length;
+                end = commentEnd;
+            }
+            else if (source[commentEnd - 1] == '\r')
+            {
+                commentEnd--;
             }
 
-            return new Token(TokenTypes.Comment, source[2..].ToString(), source.Length);
+            return new Token(TokenTypes.Comment, source[2..commentEnd].ToString(), end);
         }
 
-        if (source.StartsWith("/*"))
+        else if (source.StartsWith("/*"))
         {
-            for (int index = 2; index < source.Length; index++)
+            bool isValid = true;
+            commentEnd = source.IndexOf("*/");
+            
+            if (commentEnd == -1)
             {
-                if (source[index] == '*' && source[index + 1] == '/')
-                {
-                    return new Token(TokenTypes.Comment, source[2..(index + 1)].ToString(), index + 2);
-                }
+                commentEnd = source.Length;
+                isValid = false;
             }
 
-            return new Token(TokenTypes.Comment, source[2..].ToString(), source.Length);
+            end = commentEnd + 2;
+
+
+            return new Token(TokenTypes.Comment, source[2..commentEnd].ToString(), end, isValid);
         }
 
         return null;
@@ -428,7 +480,7 @@ internal static class Tokenizer
         {
             if (source.StartsWith(punctuator))
             {
-                return new Token(TokenTypes.Punctuator, source[..1].ToString(), 1);
+                return new Token(TokenTypes.Punctuator, source[..punctuator.Length].ToString(), punctuator.Length);
             }
         }
 
