@@ -19,6 +19,24 @@ namespace Editor.Compile
         private string _undeDeletableText = "";
         private System.IO.StreamWriter? _standardInput;
 
+        public void RunFileInTerminal(string fullPath)
+        {
+            string comandaCompilare = $"{COMPILER_NAME} {fullPath} {COMPILE_ARGUMENTS}";
+            string comandaRulare = $"{OUTPUT_FILE_NAME}.exe";
+            string comandaAsteptareTastatura = "echo. && echo. && echo Process returned status code %errorlevel% && set /p stat =\"Press any key to exit...\"";
+
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "CMD.exe",
+                    Arguments = $"/C {comandaCompilare} && {comandaRulare} & {comandaAsteptareTastatura}",
+                }
+            };
+
+            process.Start();
+        }
+
         public void RunFile(string fullPath, TextBox outputTextBox)
         {
             this._textBox = outputTextBox;
