@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Editor.LexicalAnalysis;
+namespace CppParser.LexicalAnalysis;
 
 /// <summary>
-/// Tokenizer class.
-/// Takes *raw* source code as input.
+/// Tokenizer class that can parse raw C++ source code.
 /// </summary>
-internal static class Tokenizer
+public static class Tokenizer
 {
+    /// <summary>
+    /// Parses the input string and returns a list of tokens.
+    /// </summary>
     public static List<Token> Tokenize(string input)
     {
         List<Token> tokenList = new List<Token>();

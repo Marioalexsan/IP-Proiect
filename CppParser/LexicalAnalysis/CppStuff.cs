@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Editor.LexicalAnalysis;
+namespace CppParser.LexicalAnalysis;
 
 /// <summary>
-/// <para> Contains data for C++ syntax analysis </para>
+/// <para> Contains data and methods for C++ syntax analysis. </para>
 /// <see href="https://docs.microsoft.com/en-us/cpp/cpp/character-sets?view=msvc-170"/>
 /// </summary>
 public static class CppStuff
@@ -151,12 +151,12 @@ public static class CppStuff
     /// <summary>
     /// <see href="https://en.cppreference.com/w/cpp/keyword"/>
     /// </summary>
-    public static List<string> Keywords { get; }
+    public static IReadOnlyList<string> Keywords { get; }
 
     /// <summary>
     /// <see href="https://docs.microsoft.com/en-us/cpp/cpp/punctuators-cpp?view=msvc-170"/>
     /// </summary>
-    public static List<string> Punctuators { get; }
+    public static IReadOnlyList<string> Punctuators { get; }
 
     /// <summary>
     /// Digit characters cannot be the first character of an identifier.
@@ -179,16 +179,25 @@ public static class CppStuff
         return false;
     }
 
+    /// <summary>
+    /// Checks if the character can be an octal digit (0 - 7)
+    /// </summary>
     public static bool IsOctalDigit(char c)
     {
         return '0' <= c && c <= '7';
     }
 
+    /// <summary>
+    /// Checks if the character can be a binary digit (0 - 1)
+    /// </summary>
     public static bool IsBinaryDigit(char c)
     {
         return c == '0' || c == '1';
     }
 
+    /// <summary>
+    /// Checks if the character can be a hexadecimal digit (0 - 9, A - F)
+    /// </summary>
     public static bool IsHexaDigit(char c)
     {
         if ('0' <= c && c <= '9')
@@ -203,6 +212,9 @@ public static class CppStuff
         return false;
     }
 
+    /// <summary>
+    /// Checks if the character can be used to separate digits.
+    /// </summary>
     public static bool IsDigitSeparator(char c)
     {
         return c == '\'';

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Editor.LexicalAnalysis;
+namespace CppParser.LexicalAnalysis;
 
-internal enum TokenTypes
+public enum TokenTypes
 {
     WhiteSpace = -3,
     Comment = -2,
