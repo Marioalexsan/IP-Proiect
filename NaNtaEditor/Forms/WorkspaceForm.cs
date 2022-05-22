@@ -1,4 +1,4 @@
-﻿using Editor.LexicalAnalysis;
+﻿using CppParser.LexicalAnalysis;
 using Editor.Properties;
 using System;
 using System.Collections.Generic;
