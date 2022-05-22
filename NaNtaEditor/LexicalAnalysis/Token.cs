@@ -7,19 +7,29 @@ using System.Threading.Tasks;
 
 namespace Editor.LexicalAnalysis;
 
-[DebuggerDisplay("Token = {TokenType}, Value = {Value}, SourceLength = {SourceLength}")]
+[DebuggerDisplay("ToString()")]
 internal class Token
 {
-    public Token(TokenTypes tokenType, object value, int consumedCharacters)
+    public Token(TokenTypes tokenType, object? value, int length, bool isValid = true)
     {
-        SourceLength = consumedCharacters;
-        Value = value;
         TokenType = tokenType;
+        Value = value;
+        Length = length;
+        IsValid = isValid;
     }
 
     public TokenTypes TokenType { get; }
 
-    public object Value { get; }
+    public object? Value { get; }
 
-    public int SourceLength { get; }
+    public bool IsValid { get; }
+
+    public int Start { get; set; } = 0;
+
+    public int Length { get; set; } = 0;
+
+    public override string ToString()
+    {
+        return $"Token = {TokenType}, Value = {Value}, Length = {Length}";
+    }
 }
