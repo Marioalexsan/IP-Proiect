@@ -260,5 +260,10 @@ namespace Editor.Forms
                 MessageBox.Show("Please open a project first","ceva", MessageBoxButtons.OK);
             }
         }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }
