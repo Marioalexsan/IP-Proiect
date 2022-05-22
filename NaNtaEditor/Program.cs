@@ -17,7 +17,7 @@ namespace NaNtaEditor
             Form splashScreen = new SplashScreenForm();
             new Thread(() => splashScreen.ShowDialog()).Start();
 
-            Thread.Sleep(2000);
+            Thread.Sleep(500);
 
             splashScreen.Invoke(() => splashScreen.Close());
             Form workspaceForm = new WorkspaceForm();
