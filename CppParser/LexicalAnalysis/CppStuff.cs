@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*============================================================
+*
+* File:     CppStuff.cs
+* Authors:  Miron Alexandru
+* Purpose:  Defines keywords and other lexical elements
+*           for C++
+*
+===========================================================*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

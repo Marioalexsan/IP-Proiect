@@ -1,13 +1,20 @@
-﻿using System;
+﻿/*============================================================
+*
+* File:     Compiler.cs
+* Authors:  Țuțuianu Robert
+* Purpose:  Compiles C++ files.
+*
+===========================================================*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Windows.Forms;
 using System.ComponentModel;
 
-namespace Editor.Compile
+namespace Compiler
 {
     public class Compiler
     {
@@ -15,7 +22,9 @@ namespace Editor.Compile
         private const string OUTPUT_FILE_NAME = "main";
         private const string COMPILE_ARGUMENTS = $"-o {OUTPUT_FILE_NAME}";
 
-        public void RunFileInTerminal(string fullPath, TextBox textBox)
+        public string StatusText { get; set; } = "";
+
+        public void RunFileInTerminal(string fullPath)
         {
             string comandaRulare = $"{OUTPUT_FILE_NAME}.exe";
             string comandaAsteptareTastatura = "echo. && echo. && echo Process returned status code %errorlevel% && set /p stat =\"Press any key to exit...\"";
@@ -23,10 +32,10 @@ namespace Editor.Compile
             string? errors = BuildFile(fullPath);
             if (errors != null)
             {
-                textBox.Text = errors;
+                StatusText = errors;
                 return;
             }
-            textBox.Text = "Build succeeded";
+            StatusText = "Build succeeded";
 
             var process = new Process
             {
