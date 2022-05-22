@@ -22,6 +22,7 @@ namespace Editor.XMLParser
             {"DateCreated", ""},
         };
 
+        string xmlPath = "";
         List<string> files = new List<string>();
         //    {"Ceva.cpp", "path"},
 
@@ -29,8 +30,11 @@ namespace Editor.XMLParser
         //{"Set_1","value"}
         //{"Set_2","value"}
 
-        public void openXML(string filePath,bool needDialog)
+        public void openXML(string filePathParam,bool needDialog)
         {
+            string filePath = filePathParam; 
+            Debug.WriteLine("test xmlPath str:", this.xmlPath);
+
             if (needDialog)
             {
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -38,9 +42,11 @@ namespace Editor.XMLParser
                     filePath = openFileDialog.FileName;
                 }
             }
+            this.xmlPath = filePath;
+
             //open xml file
-            
-                var fileType = filePath.Substring(filePath.Length - 3);
+
+            var fileType = filePath.Substring(filePath.Length - 3);
 
                 Debug.WriteLine(filePath);
                 Debug.WriteLine(fileType);
@@ -152,6 +158,8 @@ namespace Editor.XMLParser
         }
         public string createNewProject(string projectName, string projectPath)
         {
+            this.xmlPath = projectPath;
+            Debug.WriteLine("test xmlPath str:", this.xmlPath);
             string newConfig = $@"
             <Project>
 	            <Info>
@@ -175,6 +183,52 @@ namespace Editor.XMLParser
         {
             files.Clear();
         }
+        public void createNewFile(string fileName, string filePath)
+        {
+
+            FileStream fs = File.Create(filePath + "\\" + fileName);
+
+            //append file to xml
+            files.Add(filePath +"\\"+fileName);
+            string updatedXML = this.parseDataToXML();
+
+            System.IO.File.WriteAllText(xmlPath, updatedXML);
+            fs.Close(); 
+        }
+        public string parseDataToXML()
+        {
+
+            string filesTags = "";
+
+            foreach (string file in files)
+            {
+                filesTags += "\t\t\t<File>" + file + "</File>\n";
+            }
+
+
+                string xmlFormat = $@"
+                    <Project>
+	                    <Info>
+		                    <ProjectTitle>{(string)info["ProjectTitle"]}</ProjectTitle>
+		                    <DateCreated>{(string)info["DateCreated"]}</DateCreated>
+	                    </Info>
+	                    <Ref>
+		                    <Files>
+                               {(string)filesTags}
+		                    </Files>
+	                    </Ref>
+	                    <Settings>
+	                    </Settings>
+                    </Project>
+                    ";
+
+            return xmlFormat;
+        }
+        public string getOldXMLPath()
+        {
+            return xmlPath;
+        }
+
     }
 }
 

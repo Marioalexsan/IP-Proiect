@@ -44,7 +44,6 @@
             this.TabPages = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.label1 = new System.Windows.Forms.Label();
-            this.editAreaRichTextBox = new System.Windows.Forms.RichTextBox();
             this.menuStrip1.SuspendLayout();
             this.TabPages.SuspendLayout();
             this.SuspendLayout();
@@ -77,28 +76,28 @@
             // newProjectToolStripMenuItem
             // 
             this.newProjectToolStripMenuItem.Name = "newProjectToolStripMenuItem";
-            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(178, 26);
             this.newProjectToolStripMenuItem.Text = "New Project";
             this.newProjectToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // openProjectToolStripMenuItem
             // 
             this.openProjectToolStripMenuItem.Name = "openProjectToolStripMenuItem";
-            this.openProjectToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.openProjectToolStripMenuItem.Size = new System.Drawing.Size(178, 26);
             this.openProjectToolStripMenuItem.Text = "Open Project";
             this.openProjectToolStripMenuItem.Click += new System.EventHandler(this.openProjectToolStripMenuItem_Click);
             // 
             // addFileToolStripMenuItem
             // 
             this.addFileToolStripMenuItem.Name = "addFileToolStripMenuItem";
-            this.addFileToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.addFileToolStripMenuItem.Size = new System.Drawing.Size(178, 26);
             this.addFileToolStripMenuItem.Text = "Add File";
             this.addFileToolStripMenuItem.Click += new System.EventHandler(this.addFileToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(178, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -182,17 +181,6 @@
             this.label1.Text = "Current Project: None";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
-            // editAreaRichTextBox
-            // 
-            this.editAreaRichTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.editAreaRichTextBox.Location = new System.Drawing.Point(0, 30);
-            this.editAreaRichTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.editAreaRichTextBox.Name = "editAreaRichTextBox";
-            this.editAreaRichTextBox.Size = new System.Drawing.Size(914, 570);
-            this.editAreaRichTextBox.TabIndex = 1;
-            this.editAreaRichTextBox.Text = "";
-            this.editAreaRichTextBox.TextChanged += new System.EventHandler(this.editAreaRichTextBox_TextChanged);
-            // 
             // WorkspaceForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -200,7 +188,6 @@
             this.ClientSize = new System.Drawing.Size(914, 600);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.TabPages);
-            this.Controls.Add(this.editAreaRichTextBox);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -232,6 +219,5 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripMenuItem addFileToolStripMenuItem;
-        private System.Windows.Forms.RichTextBox editAreaRichTextBox;
     }
 }
