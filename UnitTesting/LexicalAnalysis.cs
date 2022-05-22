@@ -1,3 +1,11 @@
+/*============================================================
+*
+* File:     LexicalAnalysis.cs
+* Authors:  Miron Alexandru
+* Purpose:  Defines tests for the CppParser module.
+*
+===========================================================*/
+
 using CppParser.LexicalAnalysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;

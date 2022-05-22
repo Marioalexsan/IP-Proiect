@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*============================================================
+*
+* File:     TokenTypes.cs
+* Authors:  Miron Alexandru
+* Purpose:  Defines the TokenTypes enumeration.
+*
+===========================================================*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

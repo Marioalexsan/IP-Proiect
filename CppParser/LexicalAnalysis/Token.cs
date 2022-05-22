@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*============================================================
+*
+* File:     Token.cs
+* Authors:  Miron Alexandru
+* Purpose:  Defines the Token data class.
+*
+===========================================================*/
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
