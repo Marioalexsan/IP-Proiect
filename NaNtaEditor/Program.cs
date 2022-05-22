@@ -1,5 +1,4 @@
 using Editor.Forms;
-using Editor.LexicalAnalysis;
 using Editor.Properties;
 using System;
 using System.Threading;

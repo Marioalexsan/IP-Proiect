@@ -5,10 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Editor.LexicalAnalysis;
+namespace CppParser.LexicalAnalysis;
 
+/// <summary>
+/// Data class that represents a token.
+/// </summary>
 [DebuggerDisplay("ToString()")]
-internal class Token
+public class Token
 {
     public Token(TokenTypes tokenType, object? value, int length, bool isValid = true)
     {
