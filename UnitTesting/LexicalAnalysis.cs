@@ -6,7 +6,7 @@
 *
 ===========================================================*/
 
-using CppParser.LexicalAnalysis;
+using Framework.LexicalAnalysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
