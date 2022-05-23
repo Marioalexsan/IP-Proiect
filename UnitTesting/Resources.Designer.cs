@@ -94,5 +94,282 @@ namespace UnitTesting {
                 return ResourceManager.GetString("lexicalAnalysisSampleSource1", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #include &quot;PCHeader.h&quot;
+        ///#include &quot;SphereCollider.h&quot;
+        ///
+        ///namespace Game {
+        ///	SphereCollider::SphereCollider():
+        ///		Collider(Vector2::Zero, Static),
+        ///		radius(10.0) {}
+        ///
+        ///	SphereCollider::SphereCollider(const Vector2&amp; center, double radius, ColliderType type):
+        ///		Collider(center, type),
+        ///		radius(abs(radius)) {}
+        ///
+        ///	void SphereCollider::SetRadius(double radius) {
+        ///		this-&gt;radius = abs(radius);
+        ///	}
+        ///
+        ///	double SphereCollider::GetRadius() const {
+        ///		return radius;
+        ///	}
+        ///
+        ///	pair&lt;Vector2, Vector2&gt; SphereCollider::GetBo [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string lexicalAnalysisSampleSource10 {
+            get {
+                return ResourceManager.GetString("lexicalAnalysisSampleSource10", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #include &lt;iostream&gt;
+        ///
+        ///class AbstractHello
+        ///{
+        ///    public:
+        ///        virtual ~AbstractHello(){std::cout &lt;&lt; &quot; World!&quot;;}
+        ///        void Prnt(){std::cout &lt;&lt; &quot;Hello&quot;;}
+        ///
+        ///
+        ///};
+        ///
+        ///class ChildHello: public AbstractHello
+        ///{
+        ///    public:
+        ///        ~ChildHello(){Prnt();}
+        ///};
+        ///
+        ///int main()
+        ///{
+        ///    ChildHello *Obj;
+        ///    Obj = new ChildHello;
+        ///    delete Obj;
+        ///}.
+        /// </summary>
+        internal static string lexicalAnalysisSampleSource2 {
+            get {
+                return ResourceManager.GetString("lexicalAnalysisSampleSource2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #include &quot;PCHeader.h&quot;
+        ///#include &quot;AI.h&quot;
+        ///#include &quot;Actor.h&quot;
+        ///
+        ///namespace Game {
+        ///	AI::AI(Actor* owner):
+        ///		smoothSpeed(0.0, 0.0),
+        ///		counter(-45),
+        ///		entity(owner) {}
+        ///
+        ///	AI::AI():
+        ///		smoothSpeed(0.0, 0.0),
+        ///		counter(-45),
+        ///		entity(nullptr) {}
+        ///
+        ///	AI::~AI() {
+        ///	}
+        ///
+        ///	bool AI::EntityIsDeadAF() {
+        ///		return entity == nullptr || entity-&gt;GetStatsReference().isDead;
+        ///	}
+        ///
+        ///	bool AI::ProcessGenericDestroyDelay() {
+        ///		if (entity-&gt;GetStatsReference().isDead == true) {
+        ///			destroyDelay--;
+        ///			if (destroyDelay &lt;= 150 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string lexicalAnalysisSampleSource3 {
+            get {
+                return ResourceManager.GetString("lexicalAnalysisSampleSource3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #ifndef ACTOR_HEADER
+        ///#define ACTOR_HEADER
+        ///
+        ///#include &quot;PCHeader.h&quot;
+        ///#include &quot;Entity.h&quot;
+        ///#include &quot;RenderComponent.h&quot;
+        ///
+        ///namespace Game {
+        ///	class AI;
+        ///
+        ///	class Actor : public Entity {
+        ///	public:
+        ///		struct ActorStats {
+        ///			double health;
+        ///			double maxHealth;
+        ///			double stamina;
+        ///			double maxStamina;
+        ///			
+        ///			double shieldHealth;
+        ///			double maxShieldHealth;
+        ///
+        ///			double knockbackResistance; // UNIMPLEMENTED
+        ///
+        ///			bool invulnerable;
+        ///			bool isDead;
+        ///
+        ///			int currentInvincibilityFrames;
+        ///			int onHitInvincib [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string lexicalAnalysisSampleSource4 {
+            get {
+                return ResourceManager.GetString("lexicalAnalysisSampleSource4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #ifndef BASICTEXT_HEADER
+        ///#define BASICTEXT_HEADER
+        ///
+        ///#include &quot;PCHeader.h&quot;
+        ///
+        ///#include &quot;Drawable.h&quot;
+        ///#include &quot;AssetManager.h&quot;
+        ///
+        ///namespace Game {
+        ///	class BasicText : public Drawable {
+        ///	public:
+        ///		enum TextRenderType {
+        ///			ContinuousLeft,
+        ///			ContinuousRight,
+        ///			ContinuousCentered,
+        ///			BlockCentered, // Not implemented
+        ///			BlockLeft, // Not implemented
+        ///			BlockRight // Not implemented
+        ///		};
+        ///	protected:
+        ///		SDL_Texture* texture;
+        ///		string fontID;
+        ///		string text;
+        ///		int left;
+        ///		int right;
+        ///		int top;
+        ///		 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string lexicalAnalysisSampleSource5 {
+            get {
+                return ResourceManager.GetString("lexicalAnalysisSampleSource5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #include &quot;PCHeader.h&quot;
+        ///
+        ///#include &quot;Drawable.h&quot;
+        ///#include &quot;GraphicsEngine.h&quot;
+        ///#include &quot;Globals.h&quot;
+        ///
+        ///namespace Game {
+        ///	const Color Color::White = { 255, 255, 255 };
+        ///	const Color Color::Black = { 0, 0, 0 };
+        ///	const Color Color::Red = { 255, 0, 0 };
+        ///	const Color Color::Green = { 0, 128, 0 }; // A dark green, in a way
+        ///	const Color Color::Blue = { 0, 0, 255 };
+        ///	const Color Color::Yellow = { 255, 255, 0 };
+        ///	const Color Color::Orange = { 255, 165, 0 };
+        ///	const Color Color::Purple = { 128, 0, 128 };
+        ///	const  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string lexicalAnalysisSampleSource6 {
+            get {
+                return ResourceManager.GetString("lexicalAnalysisSampleSource6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #include &quot;PCHeader.h&quot;
+        ///#include &quot;Globals.h&quot;
+        ///
+        ///namespace Game {
+        ///	GameMaster* Globals::theGame = nullptr;
+        ///	string Globals::gameVersion = &quot;v0.91&quot;;
+        ///
+        ///	void Globals::SetTheGame(GameMaster&amp; game) {
+        ///		theGame = &amp;game;
+        ///	}
+        ///
+        ///	void Globals::GameDeaded() {
+        ///		theGame = nullptr;
+        ///	}
+        ///
+        ///	GameMaster&amp; Globals::Game() {
+        ///		if (theGame == nullptr) {
+        ///			throw std::invalid_argument(&quot;Game was nullptr in Globals::Game()!&quot;);
+        ///		}
+        ///		return *theGame;
+        ///	}
+        ///
+        ///	AudioEngine&amp; Globals::Audio() {
+        ///		if (theGame == nullptr) {
+        ///		 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string lexicalAnalysisSampleSource7 {
+            get {
+                return ResourceManager.GetString("lexicalAnalysisSampleSource7", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #include &quot;PCHeader.h&quot;
+        ///#include &quot;Tracer.h&quot;
+        ///#include &quot;Globals.h&quot;
+        ///
+        ///namespace Game {
+        ///	Tracer::Tracer(Vector2 start, Vector2 end):
+        ///		fadeCounter(0),
+        ///		targetFadeCounter(0),
+        ///		start(start),
+        ///		end(end),
+        ///		body(nullptr),
+        ///		endCap(nullptr)
+        ///	{
+        ///		Vector2 directionVector = end - start;
+        ///		double speedPower = rand() % 40 / 100.0 + 0.6;
+        ///		double forwardAngle = directionVector.Angle();
+        ///		double sideAngle = Utility::ScrollValue(directionVector.Angle() - 90.0 + (rand() % 2 * 180.0), 0.0, 360.0);
+        ///		forwardSpe [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string lexicalAnalysisSampleSource8 {
+            get {
+                return ResourceManager.GetString("lexicalAnalysisSampleSource8", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #ifndef SPRITE_HEADER
+        ///#define SPRITE_HEADER
+        ///
+        ///#include &quot;PCHeader.h&quot;
+        ///#include &quot;Drawable.h&quot;
+        ///
+        ///namespace Game {
+        ///	class Sprite : public Drawable {
+        ///	protected:
+        ///		SDL_Texture* texture;
+        ///	public:
+        ///		Sprite();
+        ///
+        ///		virtual void SetTexture(const string&amp; ID);
+        ///		Vector2 GetSize();
+        ///
+        ///		virtual void Draw();
+        ///	};
+        ///}
+        ///
+        ///#endif.
+        /// </summary>
+        internal static string lexicalAnalysisSampleSource9 {
+            get {
+                return ResourceManager.GetString("lexicalAnalysisSampleSource9", resourceCulture);
+            }
+        }
     }
 }

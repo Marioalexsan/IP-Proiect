@@ -172,4 +172,570 @@ int main()
     return 0;
 }</value>
   </data>
+  <data name="lexicalAnalysisSampleSource10" xml:space="preserve">
+    <value>#include "PCHeader.h"
+#include "SphereCollider.h"
+
+namespace Game {
+	SphereCollider::SphereCollider():
+		Collider(Vector2::Zero, Static),
+		radius(10.0) {}
+
+	SphereCollider::SphereCollider(const Vector2&amp; center, double radius, ColliderType type):
+		Collider(center, type),
+		radius(abs(radius)) {}
+
+	void SphereCollider::SetRadius(double radius) {
+		this-&gt;radius = abs(radius);
+	}
+
+	double SphereCollider::GetRadius() const {
+		return radius;
+	}
+
+	pair&lt;Vector2, Vector2&gt; SphereCollider::GetBoundingBox() {
+		auto&amp; pos = GetPosition();
+		return { Vector2(pos.x - radius, pos.y - radius), Vector2(pos.x + radius, pos.y + radius) };
+	}
+}</value>
+  </data>
+  <data name="lexicalAnalysisSampleSource2" xml:space="preserve">
+    <value>#include &lt;iostream&gt;
+
+class AbstractHello
+{
+    public:
+        virtual ~AbstractHello(){std::cout &lt;&lt; " World!";}
+        void Prnt(){std::cout &lt;&lt; "Hello";}
+
+
+};
+
+class ChildHello: public AbstractHello
+{
+    public:
+        ~ChildHello(){Prnt();}
+};
+
+int main()
+{
+    ChildHello *Obj;
+    Obj = new ChildHello;
+    delete Obj;
+}</value>
+  </data>
+  <data name="lexicalAnalysisSampleSource3" xml:space="preserve">
+    <value>#include "PCHeader.h"
+#include "AI.h"
+#include "Actor.h"
+
+namespace Game {
+	AI::AI(Actor* owner):
+		smoothSpeed(0.0, 0.0),
+		counter(-45),
+		entity(owner) {}
+
+	AI::AI():
+		smoothSpeed(0.0, 0.0),
+		counter(-45),
+		entity(nullptr) {}
+
+	AI::~AI() {
+	}
+
+	bool AI::EntityIsDeadAF() {
+		return entity == nullptr || entity-&gt;GetStatsReference().isDead;
+	}
+
+	bool AI::ProcessGenericDestroyDelay() {
+		if (entity-&gt;GetStatsReference().isDead == true) {
+			destroyDelay--;
+			if (destroyDelay &lt;= 150) {
+				entity-&gt;GetComponent().SetAlpha(uint8_t(destroyDelay * 255 / 150));
+			}
+			if (destroyDelay == 0) {
+				entity-&gt;SignalDestruction();
+			}
+			return true;
+		}
+		return false;
+	}
+
+	bool AI::DelayedSpawningLogic() {
+		// This acts as delayed spawning
+		SphereCollider&amp; collider = entity-&gt;GetCollider();
+		if (counter &lt; 0 &amp;&amp; collider.IsRegistered()) {
+			collider.UnregisterFromGame();
+		}
+
+		if (counter == 0) {
+			entity-&gt;GetCollider().RegisterToGame();
+		}
+
+		if (counter &lt;= 0) {
+			entity-&gt;GetComponent().SetAlpha(uint8_t(Utility::ClampValue(45 + counter, 0, 45) * 255 / 45));
+			return true;
+		}
+		return false;
+	}
+
+	bool AI::PlayerIsUnavailable() {
+		auto player = Globals::ThePlayer();
+		return player == nullptr || ((Actor*)player)-&gt;GetStatsReference().isDead;
+	}
+
+	bool AI::HasPlayerLineOfSight() {
+		if (PlayerIsUnavailable()) {
+			return false;
+		}
+
+		auto results = Globals::Game().CreateRayCastHitList(entity-&gt;GetCollider().GetPosition(), ((Actor*)Globals::ThePlayer())-&gt;GetCollider().GetPosition());
+
+		if (results.size() &gt; 1) {
+			// Collide with first result that is a static collider
+			Collider* hit = nullptr;
+			double distance = 0.0;
+			for (auto&amp; elem : results) {
+				auto entity = elem.second-&gt;GetEntity();
+				if (elem.second-&gt;GetColliderType() == Collider::ColliderType::Static) {
+					hit = elem.second;
+					distance = elem.first;
+					break;
+				}
+			}
+			if (hit != nullptr) {
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	bool AI::HasLineOfSight(Vector2 point) {
+		if (PlayerIsUnavailable()) {
+			return false;
+		}
+
+		auto results = Globals::Game().CreateRayCastHitList(entity-&gt;GetCollider().GetPosition(), point);
+
+		// Collide with first result that is a static collider
+		Collider* hit = nullptr;
+		double distance = 0.0;
+		for (auto&amp; elem : results) {
+			auto entity = elem.second-&gt;GetEntity();
+			if (elem.second-&gt;GetColliderType() == Collider::ColliderType::Static) {
+				hit = elem.second;
+				distance = elem.first;
+				break;
+			}
+		}
+		if (hit != nullptr) {
+			return false;
+		}
+		return true;
+	}
+
+	void AI::OnAttackHit() {}
+
+	void AI::OnHitByAttack(Actor* attacker, double damage) {
+		if (entity != nullptr) {
+			auto&amp; stats = entity-&gt;GetStatsReference();
+			if (stats.invulnerable || stats.currentInvincibilityFrames &gt; 0 || damage &lt; 0.0) {
+				return;
+			}
+			stats.currentInvincibilityFrames = stats.onHitInvincibilityFrames;
+			stats.health -= damage;
+			if (stats.health &lt;= 0.0) {
+				OnDeath();
+			}
+		}
+	}
+
+	void AI::OnDeath() {
+		if (entity != nullptr) {
+			entity-&gt;GetStatsReference().isDead = true;
+		}
+	}
+
+	
+}</value>
+  </data>
+  <data name="lexicalAnalysisSampleSource4" xml:space="preserve">
+    <value>#ifndef ACTOR_HEADER
+#define ACTOR_HEADER
+
+#include "PCHeader.h"
+#include "Entity.h"
+#include "RenderComponent.h"
+
+namespace Game {
+	class AI;
+
+	class Actor : public Entity {
+	public:
+		struct ActorStats {
+			double health;
+			double maxHealth;
+			double stamina;
+			double maxStamina;
+			
+			double shieldHealth;
+			double maxShieldHealth;
+
+			double knockbackResistance; // UNIMPLEMENTED
+
+			bool invulnerable;
+			bool isDead;
+
+			int currentInvincibilityFrames;
+			int onHitInvincibilityFrames;
+		};
+	protected:
+		ActorStats baseStats;
+		Vector2 knockback;
+
+		SphereCollider collider;
+		RenderComponent render;
+
+		AI* brain;
+
+		void ApplyKnockbackStep();
+		void ApplyKnockback();
+	public:
+		Actor(AI* brain);
+		//Actor();
+		~Actor();
+
+		inline AI* GetAI() {
+			return brain;
+		}
+
+		inline SphereCollider&amp; GetCollider() { return collider; }
+
+		inline RenderComponent&amp; GetComponent() { return render; }
+		
+		void Move(Vector2 vector);
+		void MoveForward(double amount);
+		ActorStats&amp; GetStatsReference();
+
+		void Rotate(double amount);
+
+		// Rotate on shortest path
+		void RotateTowardsDirection(double amount, double targetDirection);
+
+		virtual void Update();
+	};
+}
+
+#endif</value>
+  </data>
+  <data name="lexicalAnalysisSampleSource5" xml:space="preserve">
+    <value>#ifndef BASICTEXT_HEADER
+#define BASICTEXT_HEADER
+
+#include "PCHeader.h"
+
+#include "Drawable.h"
+#include "AssetManager.h"
+
+namespace Game {
+	class BasicText : public Drawable {
+	public:
+		enum TextRenderType {
+			ContinuousLeft,
+			ContinuousRight,
+			ContinuousCentered,
+			BlockCentered, // Not implemented
+			BlockLeft, // Not implemented
+			BlockRight // Not implemented
+		};
+	protected:
+		SDL_Texture* texture;
+		string fontID;
+		string text;
+		int left;
+		int right;
+		int top;
+		int bottom;
+		TextRenderType type;
+	public:
+		BasicText();
+		BasicText(const string&amp; fontID, const string&amp; text, TextRenderType type = TextRenderType::ContinuousLeft);
+		virtual void Draw();
+		void SetFont(const string&amp; ID);
+		void SetConstraints(int left, int right, int top, int bottom); // Not implemented
+		void SetText(const string&amp; text);
+
+		inline void SetRenderType(TextRenderType type) { this-&gt;type = type; }
+	};
+}
+
+#endif</value>
+  </data>
+  <data name="lexicalAnalysisSampleSource6" xml:space="preserve">
+    <value>#include "PCHeader.h"
+
+#include "Drawable.h"
+#include "GraphicsEngine.h"
+#include "Globals.h"
+
+namespace Game {
+	const Color Color::White = { 255, 255, 255 };
+	const Color Color::Black = { 0, 0, 0 };
+	const Color Color::Red = { 255, 0, 0 };
+	const Color Color::Green = { 0, 128, 0 }; // A dark green, in a way
+	const Color Color::Blue = { 0, 0, 255 };
+	const Color Color::Yellow = { 255, 255, 0 };
+	const Color Color::Orange = { 255, 165, 0 };
+	const Color Color::Purple = { 128, 0, 128 };
+	const Color Color::Aqua = { 0, 255, 255 };
+	const Color Color::Gray = { 128, 128, 128 };
+
+
+	Drawable::Drawable() :
+		color(Color::White),
+		alpha(255),
+		transform(),
+		relativeToCamera(true),
+		layer(Game::GraphicsEngine::CommonLayers::DefaultHeight),
+		drawableGraphicsID(0) {}
+
+	Drawable::~Drawable() {
+		// Destroy existing pointers to this drawable
+		UnregisterFromGame();
+	}
+
+	Trackable&lt;Game::Transform&gt;&amp; Drawable::GetTransform() {
+		return transform;
+	}
+
+	void Drawable::SetDirection(double direction) {
+		transform-&gt;direction = direction;
+	}
+
+	void Drawable::Rotate(double angle) {
+		transform-&gt;direction += angle;
+	}
+
+	void Drawable::SetPosition(const Vector2&amp; position) {
+		transform-&gt;position = position;
+	}
+
+	void Drawable::Move(const Vector2&amp; amount) {
+		transform-&gt;position += amount;
+	}
+
+	void Drawable::SetCenter(const Vector2&amp; center) {
+		transform-&gt;center = center;
+	}
+
+	int Drawable::GetLayer() {
+		return layer;
+	}
+
+	void Drawable::SetLayer(int layer) {
+		this-&gt;layer = layer;
+	}
+
+	void Drawable::SetRelativeToCamera(bool relativity) {
+		relativeToCamera = relativity;
+	}
+
+
+	void Drawable::RegisterToGame() {
+		if (drawableGraphicsID == 0) {
+			drawableGraphicsID = Globals::Graphics().AddDrawable(this);
+		}
+	}
+
+	void Drawable::UnregisterFromGame() {
+		Globals::Graphics().RemoveDrawable(drawableGraphicsID);
+		drawableGraphicsID = 0;
+	}
+}</value>
+  </data>
+  <data name="lexicalAnalysisSampleSource7" xml:space="preserve">
+    <value>#include "PCHeader.h"
+#include "Globals.h"
+
+namespace Game {
+	GameMaster* Globals::theGame = nullptr;
+	string Globals::gameVersion = "v0.91";
+
+	void Globals::SetTheGame(GameMaster&amp; game) {
+		theGame = &amp;game;
+	}
+
+	void Globals::GameDeaded() {
+		theGame = nullptr;
+	}
+
+	GameMaster&amp; Globals::Game() {
+		if (theGame == nullptr) {
+			throw std::invalid_argument("Game was nullptr in Globals::Game()!");
+		}
+		return *theGame;
+	}
+
+	AudioEngine&amp; Globals::Audio() {
+		if (theGame == nullptr) {
+			throw std::invalid_argument("Game was nullptr in Globals::Audio()!");
+		}
+		return theGame-&gt;Audio;
+	}
+
+	GraphicsEngine&amp; Globals::Graphics() {
+		if (theGame == nullptr) {
+			throw std::invalid_argument("Game was nullptr in Globals::Graphics()!");
+		}
+		return theGame-&gt;Graphics;
+	}
+
+	AssetManager&amp; Globals::Assets() {
+		if (theGame == nullptr) {
+			throw std::invalid_argument("Game was nullptr in Globals::Asset()!");
+		}
+		return theGame-&gt;Assets;
+	}
+
+	Entity* Globals::ThePlayer() {
+		if (theGame == nullptr) {
+			throw std::invalid_argument("Game was nullptr in Globals::ThePlayer()!");
+		}
+		return theGame-&gt;GetThePlayer();
+	}
+
+
+	GameMaster::DifficultyLevel Globals::Difficulty() {
+		if (theGame == nullptr) {
+			throw std::invalid_argument("Game was nullptr in Globals::Difficulty()!");
+		}
+		return theGame-&gt;GetDifficulty();
+	}
+
+	void Globals::ChangeDifficulty(GameMaster::DifficultyLevel difficulty) {
+		if (theGame == nullptr) {
+			throw std::invalid_argument("Game was nullptr in Globals::ChangeDifficulty()!");
+		}
+		theGame-&gt;SetDifficulty(difficulty);
+	}
+
+	string Globals::Version() {
+		return gameVersion;
+	}
+}</value>
+  </data>
+  <data name="lexicalAnalysisSampleSource8" xml:space="preserve">
+    <value>#include "PCHeader.h"
+#include "Tracer.h"
+#include "Globals.h"
+
+namespace Game {
+	Tracer::Tracer(Vector2 start, Vector2 end):
+		fadeCounter(0),
+		targetFadeCounter(0),
+		start(start),
+		end(end),
+		body(nullptr),
+		endCap(nullptr)
+	{
+		Vector2 directionVector = end - start;
+		double speedPower = rand() % 40 / 100.0 + 0.6;
+		double forwardAngle = directionVector.Angle();
+		double sideAngle = Utility::ScrollValue(directionVector.Angle() - 90.0 + (rand() % 2 * 180.0), 0.0, 360.0);
+		forwardSpeed = Vector2::NormalVector(forwardAngle) * speedPower * (0.2 + rand() % 2 / 10.0);
+		sideSpeed = Vector2::NormalVector(sideAngle) * speedPower;
+	}
+
+	Tracer::~Tracer() {}
+
+	void Tracer::SetBodyTexture(const string&amp; texture) {
+		auto&amp; lib = Globals::Assets().GetTextureLibrary();
+		if (lib.find(texture) == lib.end()) {
+			//Error
+			return;
+		}
+		this-&gt;body = lib.at(texture).texture;
+	}
+
+	void Tracer::SetCapTexture(const string&amp; texture) {
+		auto&amp; lib = Globals::Assets().GetTextureLibrary();
+		if (lib.find(texture) == lib.end()) {
+			//Error
+			return;
+		}
+		this-&gt;endCap = lib.at(texture).texture;
+	}
+
+	void Tracer::Update() {
+		if (timeToLive &lt;= 0) {
+			return;
+		}
+
+		bool fading = fadeCounter &lt;= targetFadeCounter / 2;
+		double fadeFactor = double(fadeCounter)/ (targetFadeCounter / 2);
+
+		if (fadeCounter &gt; 0) {
+			fadeCounter--;
+			if (fading &amp;&amp; targetFadeCounter &gt; 0) {
+				SetAlpha(uint8_t(GetAlpha() * fadeFactor));
+			}
+		}
+		if (fading) {
+			double speedFactor = 1.6 - 1.5 * fadeFactor * fadeFactor;
+			start += (forwardSpeed + sideSpeed) * speedFactor;
+			end += (forwardSpeed + sideSpeed) * speedFactor;
+		}
+		else {
+			start += (forwardSpeed + sideSpeed) * 0.1;
+			end += (forwardSpeed + sideSpeed) * 0.1;
+		}
+		Effect::Update();
+	}
+
+	void Tracer::Draw() {
+		using namespace Game::Utility;
+		if (body == nullptr) {
+			return;
+		}
+
+		// Body render
+		// Cap render is UNIMPLEMENTED for now
+		// AKA this class acts as an overglorified Sprite until that is done
+
+		int w, h;
+		SDL_QueryTexture(body, nullptr, nullptr, &amp;w, &amp;h);
+
+		SDL_Rect src = MakeSDLRect(0, 0, w, h);
+		SDL_Rect dest = MakeSDLRect(int(start.x), int(start.y), int((end - start).Length()), h);
+		SDL_Point cen = MakeSDLPoint(0, h / 2);
+		SDL_SetTextureAlphaMod(body, alpha);
+		SDL_SetTextureColorMod(body, color.r, color.g, color.b);
+		GraphicsEngine::RenderCopyExAdvanced(body, &amp;src, &amp;dest, (end - start).Angle() - 90.0, &amp;cen, SDL_RendererFlip::SDL_FLIP_NONE, relativeToCamera);
+	}
+}</value>
+  </data>
+  <data name="lexicalAnalysisSampleSource9" xml:space="preserve">
+    <value>#ifndef SPRITE_HEADER
+#define SPRITE_HEADER
+
+#include "PCHeader.h"
+#include "Drawable.h"
+
+namespace Game {
+	class Sprite : public Drawable {
+	protected:
+		SDL_Texture* texture;
+	public:
+		Sprite();
+
+		virtual void SetTexture(const string&amp; ID);
+		Vector2 GetSize();
+
+		virtual void Draw();
+	};
+}
+
+#endif</value>
+  </data>
 </root>
