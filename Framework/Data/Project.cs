@@ -61,7 +61,10 @@ namespace View.XMLParsing
             {
                 foreach (XmlNode node in tempFiles)
                 {
-                    Files.Add(new FileInstance(node.InnerText));
+                    Files.Add(new FileInstance(node.InnerText)
+                    {
+                        Contents = File.ReadAllText(node.InnerText)
+                    });
                 }
             }
         }
@@ -89,6 +92,12 @@ namespace View.XMLParsing
 	            </Settings>
             </Project>
             ";
+
+
+            foreach (var file in Files)
+            {
+                File.WriteAllText(file.FilePath, file.Contents);
+            }
 
             System.IO.File.WriteAllText(FilePath, xmlFormat);
         }

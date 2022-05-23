@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using View.XMLParsing;
-using System.Threading;
+﻿using Framework.Data;
 using Framework.LexicalAnalysis;
 using Framework.MVP;
-using View.Forms;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using View.XMLParsing;
 
 namespace View.Forms
 {
@@ -22,8 +12,9 @@ namespace View.Forms
         public event EventHandler<CreateProjectArgs>? OnCreateProject;
         public event EventHandler<OpenProjectArgs>? OnOpenProject;
         public event EventHandler<CreateFileArgs>? OnCreateFile;
+        public event EventHandler? OnSave;
 
-        public TabPage? SelectedPage { get; set; }
+        public Dictionary<RichTextBox, FileInstance> InstanceMapping { get; } = new();
 
         public WorkspaceForm()
         {
@@ -74,30 +65,36 @@ namespace View.Forms
             Close();
         }
 
-        public void UpdateProjectData(object? sender, Project? e)
+        public void UpdateProjectData(object? sender, Project? project)
         {
-            if (e == null)
+            addFileToolStripMenuItem.Enabled = project != null;
+
+            if (project == null)
                 return;
 
             // Set current project
-            label1.Text = $"Current Project: {e.ProjectTitle}";
+            label1.Text = $"Current Project: {project.ProjectTitle}";
 
             // Delete all tabs
+            foreach (var mapping in InstanceMapping)
+            {
+                mapping.Key.TextChanged -= SourceCodeChanged;
+            }
+            InstanceMapping.Clear();
+
             fileTabControl.TabPages.Clear();
 
-            var paths = e.Files;
-
             // Insert new tabs
-            for (int i = 0; i < paths.Count; i++)
+            foreach (var file in project.Files)
             {
                 string title = $"TabPage {fileTabControl.TabCount + 1}";
-                string[] test = paths[i].FilePath.Split("\\");
+                string[] test = file.FilePath.Split("\\");
 
                 string text = "Cannot Read File";
 
                 try
                 {
-                    text = File.ReadAllText(paths[i].FilePath);
+                    text = File.ReadAllText(file.FilePath);
                 }
                 catch (Exception ex)
                 {
@@ -107,18 +104,173 @@ namespace View.Forms
                 RichTextBox richTextBox1 = new RichTextBox
                 {
                     Dock = DockStyle.Fill,
-                    Text = text
+                    Text = text,
+                    Font = new Font(FontFamily.GenericMonospace, 12, FontStyle.Regular),
+                    SelectionColor = Color.Black,
+                    SelectionBackColor = Color.White
                 };
+
+                richTextBox1.TextChanged += SourceCodeChanged;
 
                 TabPage myTabPage = new TabPage(title)
                 {
                     Text = test[^1]
                 };
 
+                InstanceMapping[richTextBox1] = file;
+
                 myTabPage.Controls.Add(richTextBox1);
 
                 fileTabControl.TabPages.Add(myTabPage);
             }
+
+            SaveNow();
         }
+
+        private void SourceCodeChanged(object? sender, EventArgs e)
+        {
+            if (sender is not RichTextBox box)
+                return;
+
+            if (InstanceMapping.TryGetValue(box, out var file))
+            {
+                file.Contents = box.Text;
+            }
+
+            QueueSaving();
+        }
+
+        private void EditTimer_Tick(object sender, EventArgs e)
+        {
+            editTimer.Stop();
+            editTimer.Interval = 1000;
+
+            Font validFont = new Font(FontFamily.GenericMonospace, 12, FontStyle.Regular);
+            Font invalidFont = new Font(FontFamily.GenericMonospace, 12, FontStyle.Strikeout);
+
+
+            foreach ((var richTextBox, var file) in InstanceMapping)
+            {
+                richTextBox.TextChanged -= SourceCodeChanged;
+                BeginRTFUpdate(richTextBox);
+
+                int length = richTextBox.SelectionLength;
+                int start = richTextBox.SelectionStart;
+                int firstChar = richTextBox.GetCharIndexFromPosition(new Point(0, 0));
+
+
+                string input = file.Contents.ToString();
+
+                List<Token> lexerTest = Tokenizer.Tokenize(input);
+
+                int index = 0;
+
+                richTextBox.SelectAll();
+
+                richTextBox.SelectionColor = Color.Black;
+                richTextBox.SelectionBackColor = Color.White;
+                richTextBox.SelectionFont = validFont;
+
+                foreach (Token token in lexerTest)
+                {
+                    richTextBox.Select(index, token.Length);
+
+                    richTextBox.SelectionColor = GetForegroundColor(token.TokenType);
+                    richTextBox.SelectionBackColor = GetBackgroundColor(token.TokenType);
+                    richTextBox.SelectionFont = token.IsValid ? validFont : invalidFont;
+
+                    index += token.Length;
+                }
+
+                richTextBox.SelectionStart = 0;
+                richTextBox.SelectionLength = 0;
+
+                richTextBox.SelectionColor = Color.Black;
+                richTextBox.SelectionBackColor = Color.White;
+                richTextBox.SelectionFont = validFont;
+
+                richTextBox.SelectionStart = start;
+                richTextBox.SelectionLength = length;
+
+                EndRTFUpdate(richTextBox);
+                richTextBox.TextChanged += SourceCodeChanged;
+            }
+
+            // Attempt to save project
+            OnSave?.Invoke(this, new EventArgs());
+        }
+
+        private static Color GetForegroundColor(TokenTypes tokenType)
+        {
+            return tokenType switch
+            {
+                TokenTypes.WhiteSpace => Color.Black,
+                TokenTypes.Comment => Color.Green,
+                TokenTypes.Invalid => Color.White,
+                TokenTypes.Unrecognized => Color.White,
+                TokenTypes.Keyword => Color.Blue,
+                TokenTypes.Identifier => Color.DarkGray,
+                TokenTypes.IntegerLiteral => Color.DeepSkyBlue,
+                TokenTypes.FloatLiteral => Color.DarkViolet,
+                TokenTypes.BooleanLiteral => Color.Blue,
+                TokenTypes.PointerLiteral => Color.Blue,
+                TokenTypes.StringLiteral => Color.LightGreen,
+                TokenTypes.CharacterLiteral => Color.LightGreen,
+                TokenTypes.Punctuator => Color.Black,
+                _ => Color.Black
+            };
+        }
+
+        private static Color GetBackgroundColor(TokenTypes tokenType)
+        {
+            return tokenType switch
+            {
+                TokenTypes.WhiteSpace => Color.White,
+                TokenTypes.Comment => Color.White,
+                TokenTypes.Invalid => Color.Red,
+                TokenTypes.Unrecognized => Color.Red,
+                TokenTypes.Keyword => Color.White,
+                TokenTypes.Identifier => Color.White,
+                TokenTypes.IntegerLiteral => Color.White,
+                TokenTypes.FloatLiteral => Color.White,
+                TokenTypes.BooleanLiteral => Color.White,
+                TokenTypes.PointerLiteral => Color.White,
+                TokenTypes.StringLiteral => Color.White,
+                TokenTypes.CharacterLiteral => Color.White,
+                TokenTypes.Punctuator => Color.White,
+                _ => Color.White
+            };
+        }
+
+        public void SaveNow()
+        {
+            editTimer.Stop();
+            editTimer.Interval = 1;
+            editTimer.Start();
+        }
+
+        public void QueueSaving()
+        {
+            editTimer.Stop();
+            editTimer.Start();
+        }
+
+        /* Win32 Native stuff */
+
+        private void BeginRTFUpdate(RichTextBox box)
+        {
+            SendMessage(box.Handle, WM_SETREDRAW, (IntPtr)0, IntPtr.Zero);
+        }
+
+        private void EndRTFUpdate(RichTextBox box)
+        {
+            SendMessage(box.Handle, WM_SETREDRAW, (IntPtr)1, IntPtr.Zero);
+            box.Invalidate();
+        }
+
+        [DllImport("User32.dll")]
+        private extern static int SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        private const int WM_SETREDRAW = 0x0b;
     }
 }

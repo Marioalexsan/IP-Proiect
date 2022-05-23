@@ -21,4 +21,6 @@ public interface IPresenter
     public void OpenFile(object? sender, OpenFileArgs e);
 
     public void CreateFile(object? sender, CreateFileArgs e);
+
+    public void Save(object? sender, EventArgs e);
 }

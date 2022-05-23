@@ -40,6 +40,8 @@ public class FormView : IView
         WorkspaceForm.OnOpenProject += Presenter.OpenProject;
         WorkspaceForm.OnCreateFile += Presenter.CreateFile;
 
+        WorkspaceForm.OnSave += Presenter.Save;
+
         Presenter.ProjectUpdated += WorkspaceForm.UpdateProjectData;
 
         WorkspaceForm.ShowDialog();

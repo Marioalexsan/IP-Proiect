@@ -65,4 +65,9 @@ public class FormPresenter : IPresenter
 
         ProjectUpdated?.Invoke(this, Model.Project);
     }
+
+    public void Save(object? sender, EventArgs e)
+    {
+        Model.Project?.SaveXML();
+    }
 }

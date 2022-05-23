@@ -22,14 +22,14 @@ public static class Tokenizer
     /// <summary>
     /// Parses the input string and returns a list of tokens.
     /// </summary>
-    public static List<Token> Tokenize(string input)
+    public static List<Token> Tokenize(ReadOnlySpan<char> input)
     {
         List<Token> tokenList = new List<Token>();
         int start = 0;
 
         while (start < input.Length)
         {
-            ReadOnlySpan<char> stringView = input.AsSpan(start);
+            ReadOnlySpan<char> stringView = input[start..];
 
             Token? token = null;
 
@@ -486,27 +486,39 @@ public static class Tokenizer
 
     private static Token? CheckPunctuator(ReadOnlySpan<char> source)
     {
+        // Try for max length
+
+        Token? token = null;
+        int maxLength = 0;
+
         foreach (var punctuator in CppStuff.Punctuators)
         {
-            if (source.StartsWith(punctuator))
+            if (source.StartsWith(punctuator) && maxLength < punctuator.Length)
             {
-                return new Token(TokenTypes.Punctuator, source[..punctuator.Length].ToString(), punctuator.Length);
+                token = new Token(TokenTypes.Punctuator, source[..punctuator.Length].ToString(), punctuator.Length);
+                maxLength = token.Length;
             }
         }
 
-        return null;
+        return token;
     }
 
     private static Token? CheckKeyword(ReadOnlySpan<char> source)
     {
+        // Try for max length
+
+        Token? token = null;
+        int maxLength = 0;
+
         foreach (var keyword in CppStuff.Keywords)
         {
-            if (source.StartsWith(keyword))
+            if (source.StartsWith(keyword) && maxLength < keyword.Length)
             {
-                return new Token(TokenTypes.Keyword, source[..keyword.Length].ToString(), keyword.Length);
+                token = new Token(TokenTypes.Keyword, source[..keyword.Length].ToString(), keyword.Length);
+                maxLength = token.Length;
             }
         }
 
-        return null;
+        return token;
     }
 }

@@ -11,10 +11,10 @@ public class FileInstance
     {
         FilePath = filePath;
 
-        Contents = new StringBuilder();
+        Contents = "";
     }
 
     public string FilePath { get; }
 
-    public StringBuilder Contents { get; }
+    public string Contents { get; set; }
 }
