@@ -116,6 +116,7 @@ namespace View.Forms
             foreach (var mapping in InstanceMapping)
             {
                 mapping.Key.TextChanged -= SourceCodeChanged;
+                mapping.Key.KeyDown -= SourceCodeKeyDown;
             }
             InstanceMapping.Clear();
             PreviousText.Clear();
@@ -157,6 +158,7 @@ namespace View.Forms
                 };
 
                 richTextBox1.TextChanged += SourceCodeChanged;
+                richTextBox1.KeyDown += SourceCodeKeyDown;
 
                 TabPage myTabPage = new TabPage(title)
                 {
@@ -172,6 +174,21 @@ namespace View.Forms
             }
 
             SaveNow();
+        }
+
+        private void SourceCodeKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.Z)
+            {
+                e.SuppressKeyPress = true;
+                Undo_Click(this, new EventArgs());
+            }
+
+            else if (e.Control && e.KeyCode == Keys.Y)
+            {
+                e.SuppressKeyPress = true;
+                Redo_Click(this, new EventArgs());
+            }
         }
 
         private void SourceCodeChanged(object? sender, EventArgs e)
