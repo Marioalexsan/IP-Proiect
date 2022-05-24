@@ -1,4 +1,13 @@
-﻿using Framework.MVP;
+﻿/*============================================================
+*
+* File:     FormPresenter.cs
+* Authors:  Miron Alexandru
+* Purpose:  Defines the FormPresenter class, which implements the
+*           IPresenter interface.
+*
+===========================================================*/
+
+using Framework.MVP;
 using Model;
 using System;
 using System.Collections.Generic;
@@ -11,6 +20,8 @@ using View.XMLParsing;
 namespace Presenter;
 public class FormPresenter : IPresenter
 {
+    private Compiler.Compiler Compiler = new Compiler.Compiler();
+
     private IModel? _model;
     public IModel Model
     {
@@ -30,11 +41,21 @@ public class FormPresenter : IPresenter
     public void OpenProject(object? sender, OpenProjectArgs e)
     {
         Model.Project?.SaveXML();
-        Model.Project = new Project()
+
+        var newProject =  new Project()
         {
             FilePath = e.FilePath
         };
-        Model.Project.LoadFromXML(e.FilePath);
+
+        if (!newProject.LoadFromXML(e.FilePath))
+        {
+            View.ShowMessage("Couldn't open project!");
+            return;
+        }
+
+        Model.Project = newProject;
+
+        Compiler.WorkingDirectory = Path.GetDirectoryName(Model.Project.FilePath) ?? "";
         ProjectUpdated?.Invoke(this, Model.Project);
     }
 
@@ -44,10 +65,11 @@ public class FormPresenter : IPresenter
         Model.Project = new Project()
         {
             ProjectTitle = e.Name,
-            FilePath = Path.Combine(e.FolderPath, e.Name)
+            FilePath = Path.Combine(e.FolderPath, e.Name + ".xml")
         };
         Model.Project.SaveXML();
 
+        Compiler.WorkingDirectory = Path.GetDirectoryName(Model.Project.FilePath) ?? "";
         ProjectUpdated?.Invoke(this, Model.Project);
     }
 
@@ -69,5 +91,34 @@ public class FormPresenter : IPresenter
     public void Save(object? sender, EventArgs e)
     {
         Model.Project?.SaveXML();
+    }
+
+    public void BuildProject(object? sender, EventArgs e)
+    {
+        if (Model.Project == null)
+        {
+            View.ShowMessage("You must have a project open to build!");
+            return;
+        }
+
+        Compiler.BuildFiles(Model.Project.Files.Select(x => x.FilePath).ToList(), "");
+
+        View.ShowMessage("Build Status: \n\n\n" + Compiler.StatusText);
+    }
+
+    public void RunProject(object? sender, EventArgs e)
+    {
+        if (Model.Project == null)
+        {
+            View.ShowMessage("You must have a project open to run!");
+            return;
+        }
+
+        Compiler.RunFileInTerminal(new Compiler.CompileOptions()
+        {
+            AbsoluteFilePaths = Model.Project.Files.Select(x => x.FilePath).ToList(),
+            CommandLineArguments = "",
+            OutputName = Model.Project.ProjectTitle
+        });
     }
 }

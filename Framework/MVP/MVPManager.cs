@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*============================================================
+*
+* File:     IModel.cs
+* Authors:  Miron Alexandru
+* Purpose:  Defines the MVPManager helper class that starts the
+*           Model-View-Presenter application.
+*
+===========================================================*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

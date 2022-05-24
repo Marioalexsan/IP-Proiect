@@ -2,9 +2,11 @@
 *
 * File:     NewFileForm.cs
 * Authors:  Damian Gabriel-Mihai
-* Purpose:  User interface that makes it easy to create a new file 
+* Purpose:  A dialog that queries the user for information about
+*           new files that should be added to the project.
 *
 ===========================================================*/
+
 using Framework.MVP;
 using System;
 using System.Collections.Generic;

@@ -2,7 +2,7 @@
 *
 * File:     Compiler.cs
 * Authors:  Țuțuianu Robert
-* Purpose:  Compiles C++ files.
+* Purpose:  Compiles C++ files using gcc.
 *
 ===========================================================*/
 
@@ -30,15 +30,15 @@ namespace Compiler
 
         public string StatusText { get; set; } = "";
 
+        public string WorkingDirectory { get; set; } = "";
+
         public void RunFileInTerminal(CompileOptions options)
         {
             List<string> filesForCompilation = options.AbsoluteFilePaths.Where(path => !path.EndsWith(".h")).ToList();
             string compileArgumnets = $"{options.CommandLineArguments} -o {options.OutputName}";
 
-            string? errors = BuildFiles(filesForCompilation, compileArgumnets);
-            if (errors != null)
+            if (!BuildFiles(filesForCompilation, compileArgumnets))
             {
-                StatusText = errors;
                 return;
             }
 
@@ -53,11 +53,14 @@ namespace Compiler
                     Arguments = $"/C {comandaRulare} & {comandaAsteptareTastatura}",
                 }
             };
+            
+            if (WorkingDirectory != "")
+                process.StartInfo.WorkingDirectory = WorkingDirectory;
 
             process.Start();
         }
 
-        public string? BuildFiles(IEnumerable<string> fullFilePaths, string compileArguments)
+        public bool BuildFiles(IEnumerable<string> fullFilePaths, string compileArguments)
         {
             var process = new Process
             {
@@ -69,11 +72,18 @@ namespace Compiler
                     CreateNoWindow = true
                 }
             };
+
+            if (WorkingDirectory != "")
+                process.StartInfo.WorkingDirectory = WorkingDirectory;
+
             process.Start();
             process.WaitForExit();
 
             string errors = process.StandardError.ReadToEnd();
-            return errors != "" ? errors : null;
+
+            StatusText = errors != "" ? errors : "Build suceeded";
+
+            return !errors.Contains("error");
         }
     }
 }

@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*============================================================
+*
+* File:     NewFileForm.cs
+* Authors:  Damian Gabriel-Mihai
+* Purpose:  A form that appears briefly before startup, acting
+*           as a decorative splash screen.
+*
+===========================================================*/
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;

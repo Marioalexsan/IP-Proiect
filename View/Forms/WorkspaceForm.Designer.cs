@@ -51,6 +51,8 @@
             this.Redo = new System.Windows.Forms.Button();
             this.Undo = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.runButton = new System.Windows.Forms.Button();
+            this.buildButton = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.fileTabControl.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -65,8 +67,7 @@
             this.editToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(7, 3, 0, 3);
-            this.menuStrip1.Size = new System.Drawing.Size(914, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(800, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
@@ -79,20 +80,20 @@
             this.addFileToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // newProjectToolStripMenuItem
             // 
             this.newProjectToolStripMenuItem.Name = "newProjectToolStripMenuItem";
-            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newProjectToolStripMenuItem.Text = "New Project";
             this.newProjectToolStripMenuItem.Click += new System.EventHandler(this.NewProject_Click);
             // 
             // openProjectToolStripMenuItem
             // 
             this.openProjectToolStripMenuItem.Name = "openProjectToolStripMenuItem";
-            this.openProjectToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.openProjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openProjectToolStripMenuItem.Text = "Open Project";
             this.openProjectToolStripMenuItem.Click += new System.EventHandler(this.OpenProject_Click);
             // 
@@ -100,14 +101,14 @@
             // 
             this.addFileToolStripMenuItem.Enabled = false;
             this.addFileToolStripMenuItem.Name = "addFileToolStripMenuItem";
-            this.addFileToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.addFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addFileToolStripMenuItem.Text = "Add File";
             this.addFileToolStripMenuItem.Click += new System.EventHandler(this.NewFile_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitIDE_Click);
             // 
@@ -121,43 +122,43 @@
             this.pasteToolStripMenuItem,
             this.selectAllToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(49, 24);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
             // 
             // undoToolStripMenuItem
             // 
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
-            this.undoToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.undoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.undoToolStripMenuItem.Text = "Undo";
             // 
             // redoToolStripMenuItem
             // 
             this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
-            this.redoToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.redoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.redoToolStripMenuItem.Text = "Redo";
             // 
             // cutToolStripMenuItem
             // 
             this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
-            this.cutToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.cutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cutToolStripMenuItem.Text = "Cut";
             // 
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.copyToolStripMenuItem.Text = "Copy";
             // 
             // pasteToolStripMenuItem
             // 
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pasteToolStripMenuItem.Text = "Paste";
             // 
             // selectAllToolStripMenuItem
             // 
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.selectAllToolStripMenuItem.Text = "Select All";
             // 
             // fileTabControl
@@ -165,17 +166,19 @@
             this.fileTabControl.Controls.Add(this.tabPage1);
             this.fileTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fileTabControl.Location = new System.Drawing.Point(0, 0);
+            this.fileTabControl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.fileTabControl.Name = "fileTabControl";
             this.fileTabControl.SelectedIndex = 0;
-            this.fileTabControl.Size = new System.Drawing.Size(914, 491);
+            this.fileTabControl.Size = new System.Drawing.Size(800, 367);
             this.fileTabControl.TabIndex = 2;
             // 
             // tabPage1
             // 
-            this.tabPage1.Location = new System.Drawing.Point(4, 29);
+            this.tabPage1.Location = new System.Drawing.Point(4, 24);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(906, 458);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage1.Size = new System.Drawing.Size(792, 339);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Empty";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -188,30 +191,32 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 0);
+            this.label1.Location = new System.Drawing.Point(10, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(150, 20);
+            this.label1.Size = new System.Drawing.Size(122, 15);
             this.label1.TabIndex = 3;
             this.label1.Text = "Current Project: None";
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.buildButton);
+            this.panel1.Controls.Add(this.runButton);
             this.panel1.Controls.Add(this.Redo);
             this.panel1.Controls.Add(this.Undo);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 30);
-            this.panel1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(914, 79);
+            this.panel1.Size = new System.Drawing.Size(800, 59);
             this.panel1.TabIndex = 4;
             // 
             // Redo
             // 
             this.Redo.Image = ((System.Drawing.Image)(resources.GetObject("Redo.Image")));
-            this.Redo.Location = new System.Drawing.Point(53, 34);
+            this.Redo.Location = new System.Drawing.Point(46, 26);
+            this.Redo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Redo.Name = "Redo";
-            this.Redo.Size = new System.Drawing.Size(35, 28);
+            this.Redo.Size = new System.Drawing.Size(31, 21);
             this.Redo.TabIndex = 4;
             this.Redo.UseVisualStyleBackColor = true;
             this.Redo.Click += new System.EventHandler(this.Redo_Click);
@@ -219,9 +224,10 @@
             // Undo
             // 
             this.Undo.Image = ((System.Drawing.Image)(resources.GetObject("Undo.Image")));
-            this.Undo.Location = new System.Drawing.Point(12, 34);
+            this.Undo.Location = new System.Drawing.Point(10, 26);
+            this.Undo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Undo.Name = "Undo";
-            this.Undo.Size = new System.Drawing.Size(35, 28);
+            this.Undo.Size = new System.Drawing.Size(31, 21);
             this.Undo.TabIndex = 0;
             this.Undo.UseVisualStyleBackColor = true;
             this.Undo.Click += new System.EventHandler(this.Undo_Click);
@@ -230,22 +236,40 @@
             // 
             this.panel2.Controls.Add(this.fileTabControl);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 109);
-            this.panel2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.panel2.Location = new System.Drawing.Point(0, 83);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(914, 491);
+            this.panel2.Size = new System.Drawing.Size(800, 367);
             this.panel2.TabIndex = 5;
+            // 
+            // runButton
+            // 
+            this.runButton.Location = new System.Drawing.Point(161, 24);
+            this.runButton.Name = "runButton";
+            this.runButton.Size = new System.Drawing.Size(75, 23);
+            this.runButton.TabIndex = 5;
+            this.runButton.Text = "Run";
+            this.runButton.UseVisualStyleBackColor = true;
+            this.runButton.Click += new System.EventHandler(this.RunProject_Click);
+            // 
+            // buildButton
+            // 
+            this.buildButton.Location = new System.Drawing.Point(80, 24);
+            this.buildButton.Name = "buildButton";
+            this.buildButton.Size = new System.Drawing.Size(75, 23);
+            this.buildButton.TabIndex = 6;
+            this.buildButton.Text = "Build";
+            this.buildButton.UseVisualStyleBackColor = true;
+            this.buildButton.Click += new System.EventHandler(this.BuildProject_Click);
             // 
             // WorkspaceForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(914, 600);
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "WorkspaceForm";
             this.Text = "WorkspaceForm";
             this.Load += new System.EventHandler(this.WorkspaceForm_Load);
@@ -283,5 +307,7 @@
         private Panel panel2;
         private Button Redo;
         private Button Undo;
+        private Button runButton;
+        private Button buildButton;
     }
 }

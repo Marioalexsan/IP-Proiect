@@ -1,17 +1,19 @@
 ﻿/*============================================================
 *
 * File:     WorkspaceForm.cs 
-* Methods:  NewProject_Click, OpenProject_Click, NewFile_Click,Undo_Click, Redo_Click, UndoRedoHandler
-* Authors:  Damian Gabriel-Mihai
-* Purpose:  Main user interface
+* Authors:  Damian Gabriel-Mihai, Țuțuianu Robert, Florea Alexandru-Daniel,
+*           Miron Alexandru
+* Purpose:  Defines the main interface of the IDE.
 *
 ===========================================================*/
 
+using Framework.Commands;
 using Framework.Data;
 using Framework.LexicalAnalysis;
 using Framework.MVP;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using View.Commands;
 using View.XMLParsing;
 
 namespace View.Forms
@@ -23,8 +25,12 @@ namespace View.Forms
         public event EventHandler<CreateFileArgs>? OnCreateFile;
         public event EventHandler? OnSave;
 
+        public event EventHandler? OnBuildProject;
+        public event EventHandler? OnRunProject;
+
         public Dictionary<RichTextBox, FileInstance> InstanceMapping { get; } = new();
-        public Memento memento = new Framework.Data.Memento();
+
+        public Dictionary<RichTextBox, string> PreviousText { get; } = new Dictionary<RichTextBox, string>();
 
         public WorkspaceForm()
         {
@@ -91,6 +97,8 @@ namespace View.Forms
                 mapping.Key.TextChanged -= SourceCodeChanged;
             }
             InstanceMapping.Clear();
+            PreviousText.Clear();
+
 
             fileTabControl.TabPages.Clear();
 
@@ -128,6 +136,7 @@ namespace View.Forms
                 };
 
                 InstanceMapping[richTextBox1] = file;
+                PreviousText[richTextBox1] = richTextBox1.Text;
 
                 myTabPage.Controls.Add(richTextBox1);
 
@@ -135,18 +144,6 @@ namespace View.Forms
             }
 
             SaveNow();
-
-            //memento
-            List<FileInstance> filesContent = new List<FileInstance>();
-            foreach (RichTextBox a in InstanceMapping.Keys)
-            {
-                filesContent.Add(InstanceMapping[a]);
-            }
-            memento.InitializeHistory(filesContent);
-            memento.CheckFilesHistory();
-            memento.CheckCurrentIndexes();
-        
-        
         }
 
         private void SourceCodeChanged(object? sender, EventArgs e)
@@ -154,16 +151,78 @@ namespace View.Forms
             if (sender is not RichTextBox box)
                 return;
 
+            int pointerPos = box.SelectionStart;
+
             if (InstanceMapping.TryGetValue(box, out var file))
             {
                 file.Contents = box.Text;
 
-                Debug.WriteLine(file);
-                Debug.WriteLine(box);
-                Debug.WriteLine("update in file:" + file.FilePath);
-                Debug.WriteLine("new value:" + box.Text);
-                memento.TabContentUpdated(file, box.Text);
+                int beginLen = 0;
+                int endLen = 0;
+
+                string newText = box.Text;
+                string oldText = PreviousText[box];
+
+                for (int i = 0; i < newText.Length && i < oldText.Length && i < pointerPos; i++)
+                {
+                    if (newText[i] == oldText[i])
+                    {
+                        beginLen++;
+                    }
+                }
+
+                for (int i = newText.Length - 1, j = oldText.Length - 1; i >= Math.Max(pointerPos, 0) && j >= 0; i--, j--)
+                {
+                    if (newText[i] == oldText[j])
+                    {
+                        endLen++;
+                    }
+                }
+
+                int unmatchedOld = oldText.Length - beginLen - endLen;
+                int unmatchedNew = newText.Length - beginLen - endLen;
+
+                if (unmatchedOld < 0)
+                {
+                    unmatchedNew += -unmatchedOld;
+                    beginLen -= -unmatchedOld;
+                    unmatchedOld = 0;
+                }
+
+                // Try for a Delete Command
+                if (unmatchedOld > 0)
+                {
+                    file.Memento.Record(new DeleteCommand()
+                    {
+                        Position = beginLen,
+                        DeletedString = oldText.Substring(beginLen, unmatchedOld),
+                        Target = box
+                    });
+
+                    Debug.WriteLine("New delete:");
+                    Debug.WriteLine("---" + oldText.Substring(beginLen, unmatchedOld) + "---");
+                }
+
+                // Try for a Write Command
+                if (unmatchedNew > 0)
+                {
+                    file.Memento.Record(new WriteCommand()
+                    {
+                        Position = beginLen,
+                        WrittenString = newText.Substring(beginLen, unmatchedNew),
+                        Target = box
+                    });
+
+                    Debug.WriteLine("New writer:");
+                    Debug.WriteLine("---" + newText.Substring(beginLen, unmatchedNew) + "---");
+                }
+
+                Debug.WriteLine("===============");
+                Debug.WriteLine("Current Undoables: " + file.Memento.UndoableCount);
+                Debug.WriteLine("Current Redoables: " + file.Memento.RedoableCount);
             }
+
+            PreviousText[box] = box.Text;
 
             QueueSaving();
         }
@@ -305,8 +364,28 @@ namespace View.Forms
         /// </summary>
         private void Undo_Click(object sender, EventArgs e)
         {
-            UndoRedoHandler("undo");
+            foreach ((var box, var file) in InstanceMapping)
+            {
+                if (!fileTabControl.SelectedTab.Controls.Contains(box))
+                    continue;
+
+                IEditorCommand? command = file.Memento.Undo();
+
+                if (command == null)
+                    return;
+
+                box.TextChanged -= SourceCodeChanged;
+
+                command.Undo();
+
+                PreviousText[box] = box.Text;
+
+                box.TextChanged += SourceCodeChanged;
+            }
+
+            QueueSaving();
         }
+
         /// <summary>
         /// Callback to the redo button
         /// </summary>
@@ -314,49 +393,26 @@ namespace View.Forms
         /// <param name="e"></param>
         private void Redo_Click(object sender, EventArgs e)
         {
-            UndoRedoHandler("redo");
-        }
-        /// <summary>
-        /// Manages how actions are parsed to the Memento Entity and how the Rich Text Boxes are updated corresponding with the user's actions
-        /// </summary>
-        private void UndoRedoHandler(string who)
-        {
-            Debug.WriteLine("undo");
-            foreach (RichTextBox K in InstanceMapping.Keys)
+            foreach ((var box, var file) in InstanceMapping)
             {
-                if (fileTabControl.SelectedTab.Controls.Contains(K))
-                {
-                    Debug.WriteLine("tab founded");
-                    Debug.WriteLine("FileInstance aferenmt");
-                    Debug.WriteLine(InstanceMapping[K]);
-                    string undoValue = "";
-                    if(who == "undo")
-                    {
-                        undoValue = memento.UndoTab(InstanceMapping[K]);
+                if (!fileTabControl.SelectedTab.Controls.Contains(box))
+                    continue;
 
-                    }
-                    else
-                    {
-                        undoValue = memento.RedoTab(InstanceMapping[K]);
+                IEditorCommand? command = file.Memento.Redo();
 
-                    }
-                    Debug.WriteLine("UNDO VALUE:" + undoValue);
+                if (command == null)
+                    return;
 
-                    foreach (var mapping in InstanceMapping)
-                    {
-                        mapping.Key.TextChanged -= SourceCodeChanged;
-                    }
+                box.TextChanged -= SourceCodeChanged;
 
-                    K.Text = undoValue;
+                command.Redo();
 
-                    foreach (var mapping in InstanceMapping)
-                    {
-                        mapping.Key.TextChanged += SourceCodeChanged;
-                    }
+                PreviousText[box] = box.Text;
 
-
-                }
+                box.TextChanged += SourceCodeChanged;
             }
+
+            QueueSaving();
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -367,6 +423,16 @@ namespace View.Forms
         private void WorkspaceForm_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void RunProject_Click(object sender, EventArgs e)
+        {
+            OnRunProject?.Invoke(this, e);
+        }
+
+        private void BuildProject_Click(object sender, EventArgs e)
+        {
+            OnBuildProject?.Invoke(this, e);
         }
     }
 }

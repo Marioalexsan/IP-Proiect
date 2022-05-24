@@ -1,4 +1,13 @@
-﻿using Framework.Data;
+﻿/*============================================================
+*
+* File:     IModel.cs
+* Authors:  Miron Alexandru
+* Purpose:  Defines the IModel interface for the Model-View-Presenter
+*           architecture.
+*
+===========================================================*/
+
+using Framework.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +18,5 @@ using View.XMLParsing;
 namespace Framework.MVP;
 public interface IModel
 {
-    public MVPManager Manager { get; set; }
-
     public Project? Project { get; set; }
 }

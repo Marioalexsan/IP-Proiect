@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*============================================================
+*
+* File:     TestUtility.cs
+* Authors:  Miron Alexandru
+* Purpose:  Helper methods for streamlining testing.
+*
+===========================================================*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

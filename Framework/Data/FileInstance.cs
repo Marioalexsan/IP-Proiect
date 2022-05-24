@@ -2,9 +2,11 @@
 *
 * File:     FileInstance.cs
 * Authors:  Damian Gabriel-Mihai
-* Purpose:  Defines an entity that manages the process of creating a new file
+* Purpose:  Defines the FileInstance class that contains an open
+*           editor file's state.
 *
 ===========================================================*/
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,4 +29,6 @@ public class FileInstance
     public string FilePath { get; }
 
     public string Contents { get; set; }
+
+    public Memento Memento { get; } = new Memento();
 }

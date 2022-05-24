@@ -2,9 +2,11 @@
 *
 * File:     Project.cs
 * Authors:  Damian Gabriel-Mihai
-* Purpose:  Manages the process of parsing data from the established xml format
+* Purpose:  Defines the Project class responsible for managing
+*           C++ projects.
 *
 ===========================================================*/
+
 using Framework.Data;
 using System;
 using System.Collections.Generic;
@@ -26,14 +28,17 @@ namespace View.XMLParsing
         /// Path to the xml config
         /// </summary>
         public string FilePath { get; set; } = "";
+
         /// <summary>
         /// References to the file included in the project
         /// </summary>
         public List<FileInstance> Files { get; } = new();
+
         /// <summary>
         /// Info about the project
         /// </summary>
         public string ProjectTitle { get; set; } = "";
+
         /// <summary>
         /// Used when the user creates a new file. The new reference is added into the XML and ready to use now or next project start-up.
         /// </summary>
@@ -46,31 +51,34 @@ namespace View.XMLParsing
             Files.Add(new FileInstance(path));
             SaveXML();
         }
+
         /// <summary>
         /// Parse project data (xml location,title,included files) into data structures. 
         /// </summary>
-        public void LoadFromXML(string filePath)
+        public bool LoadFromXML(string filePath)
         {
             XmlDocument doc = new XmlDocument();
 
             FilePath = filePath;
 
-            var fileType = filePath[^3..];
-
-            if (fileType != "xml")
-                return;
-
-            doc.Load(filePath);
+            try
+            {
+                doc.Load(filePath);
+            }
+            catch
+            {
+                return false;
+            }
 
             // TODO: Check file integrity
 
             if (doc.DocumentElement == null)
-                return;
+                return false;
 
             XmlNode? parent = doc.DocumentElement.SelectSingleNode("/Project");
 
             if (parent == null)
-                return;
+                return false;
 
             ProjectTitle = doc.DocumentElement.SelectSingleNode($"/Project/Info/ProjectTitle")!.InnerText;
 
@@ -82,12 +90,21 @@ namespace View.XMLParsing
             {
                 foreach (XmlNode node in tempFiles)
                 {
-                    Files.Add(new FileInstance(node.InnerText)
+                    try
                     {
-                        Contents = File.ReadAllText(node.InnerText)
-                    });
+                        Files.Add(new FileInstance(node.InnerText)
+                        {
+                            Contents = File.ReadAllText(node.InnerText)
+                        });
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
             }
+
+            return true;
         }
         /// <summary>
         /// Parse from data structures into xml format.

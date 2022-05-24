@@ -2,8 +2,7 @@
 *
 * File:     CppStuff.cs
 * Authors:  Miron Alexandru
-* Purpose:  Defines keywords and other lexical elements
-*           for C++
+* Purpose:  Defines keywords and other lexical elements for C++.
 *
 ===========================================================*/
 

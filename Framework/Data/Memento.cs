@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*============================================================
+*
+* File:     EventArgs.cs
+* Authors:  Damian Gabriel-Mihai
+* Purpose:  Defines the Memento class that can store the state
+*           of editor commands.
+*
+===========================================================*/
+
+using Framework.Commands;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,97 +17,65 @@ using System.Threading.Tasks;
 
 namespace Framework.Data
 {
+    /// <summary>
+    /// Class that stores editor commands.
+    /// </summary>
     public class Memento
     {
-        //var1
-        public Dictionary<FileInstance, List<string>> history { get; } = new();
-        public Dictionary<FileInstance, int> currentIndexInHistory { get; } = new();
+        private List<IEditorCommand> _items = new List<IEditorCommand>();
 
-        //var2
-        public Dictionary<FileInstance, List<ChangeEntity>> history_2 { get; } = new();
-        public Dictionary<FileInstance, int> currentIndexInHistory_2 { get; } = new();
+        private int _lastApplied = -1;
 
-        //List<List<string>> history = new List<List<string>>();
-        
-        public void InitializeHistory(List<FileInstance> values)
+        public int UndoableCount => _lastApplied + 1;
+
+        public int RedoableCount => _items.Count - UndoableCount;
+
+        public void Record(IEditorCommand command)
         {
-            //values = default value found inside each file
-            for (int i = 0; i < values.Count; i++)
+            // Remove elements pending for redo
+            if (RedoableCount > 0)
             {
-                List<string> newFileHistory = new List<string>();
-                newFileHistory.Add(values[i].Contents);
-                history[values[i]] = newFileHistory;
-
-                currentIndexInHistory[values[i]] = 0;
+                _items.RemoveRange(_lastApplied + 1, RedoableCount);
             }
-        }
-        public void TabContentUpdated(FileInstance fileKey, string newValue)
-        {
-            Debug.WriteLine("tab content updated");
-            foreach ((var file, var list) in history)
+
+
+            // Try to concatenate similar commands
+            if (_items.Count > 0)
             {
-                if(file == fileKey)
+                IEditorCommand? merged = _items[^1].TryMerge(command);
+
+                // Update top with merged
+                if (merged != null)
                 {
-                    Debug.WriteLine("file founded:", fileKey.Contents);
-                    history[file].Add(newValue);
-                    
-                    //cannot redo if the file is updated
-                    currentIndexInHistory[fileKey] = history[fileKey].Count - 1;
-                    Debug.WriteLine("curr index shift:"+currentIndexInHistory[fileKey]);
+                    _items[^1] = merged;
+                    return;
                 }
             }
 
-            CheckFilesHistory();
-            CheckCurrentIndexes();
-        }
-        public string UndoTab(FileInstance fileKey)
-        {
-            if(currentIndexInHistory[fileKey] == 0)
-            {
-                return history[fileKey][0];
-            }
-            
-            currentIndexInHistory[fileKey]--;
-
-            return history[fileKey][currentIndexInHistory[fileKey]];
-        
-        }
-        public string RedoTab(FileInstance fileKey)
-        {
-
-            if (currentIndexInHistory[fileKey] == history[fileKey].Count -1)
-            {
-                return history[fileKey][history[fileKey].Count - 1];
-            }
-
-            currentIndexInHistory[fileKey]++;
-
-            return history[fileKey][currentIndexInHistory[fileKey]];
-
-
-            return "A";
+            _items.Add(command);
+            _lastApplied += 1;
         }
 
-        //temp functions
-        public void CheckFilesHistory()
+        public IEditorCommand? Undo()
         {
-            Debug.WriteLine("---> Check files history");
-            foreach((var file, var list) in history)
-            {
-                Debug.WriteLine("--->new item:");
-                foreach(var item in list)
-                {
-                    Debug.WriteLine("->item:", item);
-                }
-            }
+            if (_lastApplied < 0)
+                return null;
+
+            return _items[_lastApplied--];
         }
-        public void CheckCurrentIndexes()
+
+        public IEditorCommand? Redo()
         {
-            Debug.WriteLine("----> Check current indexes");
-            foreach ((var file, var lastIndex) in currentIndexInHistory)
-            {
-                Debug.WriteLine("curr indexs:", lastIndex);
-            }
+            if (_lastApplied + 1 >= _items.Count)
+                return null;
+
+            return _items[++_lastApplied];
+        }
+
+        public void Clear()
+        {
+            _items.Clear();
+            _lastApplied = -1;
         }
     }
 }

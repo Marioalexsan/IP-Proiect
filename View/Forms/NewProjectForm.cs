@@ -1,10 +1,12 @@
 ﻿/*============================================================
 *
-* File:     NewPojectForm.cs
+* File:     NewProjectForm.cs
 * Authors:  Damian Gabriel-Mihai
-* Purpose:  User interface that makes it easy to create a new project
+* Purpose:  A dialog that queries the user for information about
+*           the new project to be created.
 *
 ===========================================================*/
+
 using Framework.MVP;
 using System;
 using System.Collections.Generic;

@@ -1,3 +1,11 @@
+/*============================================================
+*
+* File:     Program.cs
+* Authors:  Miron Alexandru
+* Purpose:  Contains the entry point of the application.
+*
+===========================================================*/
+
 using View.Forms;
 using System;
 using System.Threading;

@@ -1,4 +1,13 @@
-﻿using Framework.Data;
+﻿/*============================================================
+*
+* File:     FormModel.cs
+* Authors:  Miron Alexandru
+* Purpose:  Defines the FormModel class, which implements the
+*           IModel interface.
+*
+===========================================================*/
+
+using Framework.Data;
 using Framework.MVP;
 using System;
 using System.Collections.Generic;
@@ -10,12 +19,5 @@ using View.XMLParsing;
 namespace Model;
 public class FormModel : IModel
 {
-    private MVPManager? _manager;
-    public MVPManager Manager
-    {
-        get => _manager ?? throw new Exception("Manager has not been set.");
-        set => _manager = value;
-    }
-
     public Project? Project { get; set; }
 }

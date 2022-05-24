@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*============================================================
+*
+* File:     IPresenter.cs
+* Authors:  Miron Alexandru
+* Purpose:  Defines the IPresenter interface for the Model-View-Presenter
+*           architecture.
+*
+===========================================================*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,4 +32,8 @@ public interface IPresenter
     public void CreateFile(object? sender, CreateFileArgs e);
 
     public void Save(object? sender, EventArgs e);
+
+    public void BuildProject(object? sender, EventArgs e);
+
+    public void RunProject(object? sender, EventArgs e);
 }
