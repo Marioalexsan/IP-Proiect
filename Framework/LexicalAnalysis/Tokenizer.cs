@@ -260,7 +260,7 @@ public static class Tokenizer
             }
 
             // Read decimal exponent
-            if (char.ToLowerInvariant(source[index]) == 'e')
+            if (index < source.Length && char.ToLowerInvariant(source[index]) == 'e')
             {
                 index++;
 

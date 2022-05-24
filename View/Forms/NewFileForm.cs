@@ -1,4 +1,11 @@
-﻿using Framework.MVP;
+﻿/*============================================================
+*
+* File:     NewFileForm.cs
+* Authors:  Damian Gabriel-Mihai
+* Purpose:  User interface that makes it easy to create a new file 
+*
+===========================================================*/
+using Framework.MVP;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,6 +18,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace View.Forms;
+/// <summary>
+/// Manages the process of creating a new file
+/// </summary>
 public partial class NewFileForm : Form
 {
     public CreateFileArgs? Result { get; private set; }
@@ -19,7 +29,9 @@ public partial class NewFileForm : Form
     {
         InitializeComponent();
     }
-
+    /// <summary>
+    /// Get the location where the new file will be stored.
+    /// </summary>
     private void OpenPath_Click(object sender, EventArgs e)
     {
         using var fbd = new FolderBrowserDialog();
@@ -32,7 +44,9 @@ public partial class NewFileForm : Form
         Debug.WriteLine("new file path---:", fbd.SelectedPath);
         filePathTextBox.Text = fbd.SelectedPath;
     }
-
+    /// <summary>
+    /// Callback to the create new file button.
+    /// </summary>
     private void CreateFile_Click(object sender, EventArgs e)
     {
         Result = new CreateFileArgs()

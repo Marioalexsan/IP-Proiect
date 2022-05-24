@@ -1,4 +1,13 @@
-﻿using Framework.Data;
+﻿/*============================================================
+*
+* File:     WorkspaceForm.cs 
+* Methods:  NewProject_Click, OpenProject_Click, NewFile_Click,Undo_Click, Redo_Click, UndoRedoHandler
+* Authors:  Damian Gabriel-Mihai
+* Purpose:  Main user interface
+*
+===========================================================*/
+
+using Framework.Data;
 using Framework.LexicalAnalysis;
 using Framework.MVP;
 using System.Diagnostics;
@@ -15,6 +24,7 @@ namespace View.Forms
         public event EventHandler? OnSave;
 
         public Dictionary<RichTextBox, FileInstance> InstanceMapping { get; } = new();
+        public Memento memento = new Framework.Data.Memento();
 
         public WorkspaceForm()
         {
@@ -125,6 +135,18 @@ namespace View.Forms
             }
 
             SaveNow();
+
+            //memento
+            List<FileInstance> filesContent = new List<FileInstance>();
+            foreach (RichTextBox a in InstanceMapping.Keys)
+            {
+                filesContent.Add(InstanceMapping[a]);
+            }
+            memento.InitializeHistory(filesContent);
+            memento.CheckFilesHistory();
+            memento.CheckCurrentIndexes();
+        
+        
         }
 
         private void SourceCodeChanged(object? sender, EventArgs e)
@@ -135,6 +157,12 @@ namespace View.Forms
             if (InstanceMapping.TryGetValue(box, out var file))
             {
                 file.Contents = box.Text;
+
+                Debug.WriteLine(file);
+                Debug.WriteLine(box);
+                Debug.WriteLine("update in file:" + file.FilePath);
+                Debug.WriteLine("new value:" + box.Text);
+                memento.TabContentUpdated(file, box.Text);
             }
 
             QueueSaving();
@@ -272,5 +300,73 @@ namespace View.Forms
         private extern static int SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
         private const int WM_SETREDRAW = 0x0b;
+        /// <summary>
+        /// Callback to the undo button
+        /// </summary>
+        private void Undo_Click(object sender, EventArgs e)
+        {
+            UndoRedoHandler("undo");
+        }
+        /// <summary>
+        /// Callback to the redo button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Redo_Click(object sender, EventArgs e)
+        {
+            UndoRedoHandler("redo");
+        }
+        /// <summary>
+        /// Manages how actions are parsed to the Memento Entity and how the Rich Text Boxes are updated corresponding with the user's actions
+        /// </summary>
+        private void UndoRedoHandler(string who)
+        {
+            Debug.WriteLine("undo");
+            foreach (RichTextBox K in InstanceMapping.Keys)
+            {
+                if (fileTabControl.SelectedTab.Controls.Contains(K))
+                {
+                    Debug.WriteLine("tab founded");
+                    Debug.WriteLine("FileInstance aferenmt");
+                    Debug.WriteLine(InstanceMapping[K]);
+                    string undoValue = "";
+                    if(who == "undo")
+                    {
+                        undoValue = memento.UndoTab(InstanceMapping[K]);
+
+                    }
+                    else
+                    {
+                        undoValue = memento.RedoTab(InstanceMapping[K]);
+
+                    }
+                    Debug.WriteLine("UNDO VALUE:" + undoValue);
+
+                    foreach (var mapping in InstanceMapping)
+                    {
+                        mapping.Key.TextChanged -= SourceCodeChanged;
+                    }
+
+                    K.Text = undoValue;
+
+                    foreach (var mapping in InstanceMapping)
+                    {
+                        mapping.Key.TextChanged += SourceCodeChanged;
+                    }
+
+
+                }
+            }
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void WorkspaceForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
