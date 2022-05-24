@@ -16,26 +16,34 @@ using System.ComponentModel;
 
 namespace Compiler
 {
+    public class CompileOptions
+    {
+        public IEnumerable<string> AbsoluteFilePaths { get; set; } = new List<string>();
+        public string CommandLineArguments { get; set; } = string.Empty;
+        public string OutputName { get; set; } = "main";
+    }
+
     public class Compiler
     {
         private const string COMPILER_NAME = "g++";
-        private const string OUTPUT_FILE_NAME = "main";
-        private const string COMPILE_ARGUMENTS = $"-o {OUTPUT_FILE_NAME}";
+        string comandaAsteptareTastatura = "echo. && echo. && echo Process returned status code %errorlevel% && set /p stat =\"Press any key to exit...\"";
 
         public string StatusText { get; set; } = "";
 
-        public void RunFileInTerminal(string fullPath)
+        public void RunFileInTerminal(CompileOptions options)
         {
-            string comandaRulare = $"{OUTPUT_FILE_NAME}.exe";
-            string comandaAsteptareTastatura = "echo. && echo. && echo Process returned status code %errorlevel% && set /p stat =\"Press any key to exit...\"";
+            List<string> filesForCompilation = options.AbsoluteFilePaths.Where(path => !path.EndsWith(".h")).ToList();
+            string compileArgumnets = $"{options.CommandLineArguments} -o {options.OutputName}";
 
-            string? errors = BuildFile(fullPath);
+            string? errors = BuildFiles(filesForCompilation, compileArgumnets);
             if (errors != null)
             {
                 StatusText = errors;
                 return;
             }
+
             StatusText = "Build succeeded";
+            string comandaRulare = $"{options.OutputName}.exe";
 
             var process = new Process
             {
@@ -49,14 +57,14 @@ namespace Compiler
             process.Start();
         }
 
-        public static string? BuildFile(string fullPath)
+        public string? BuildFiles(IEnumerable<string> fullFilePaths, string compileArguments)
         {
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = COMPILER_NAME,
-                    Arguments = $"{fullPath} {COMPILE_ARGUMENTS}",
+                    Arguments = $"{string.Join(" ", fullFilePaths)} {compileArguments}",
                     RedirectStandardError = true,
                     CreateNoWindow = true
                 }
