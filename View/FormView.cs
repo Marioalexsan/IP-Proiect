@@ -19,6 +19,10 @@ using Presenter;
 using View.XMLParsing;
 
 namespace View;
+
+/// <summary>
+/// Concrete implementation of the IView interface using Windows Forms.
+/// </summary>
 public class FormView : IView
 {
     private IPresenter? _presenter;
@@ -48,9 +52,11 @@ public class FormView : IView
         WorkspaceForm.OnCreateProject += Presenter.CreateProject;
         WorkspaceForm.OnOpenProject += Presenter.OpenProject;
         WorkspaceForm.OnCreateFile += Presenter.CreateFile;
+        WorkspaceForm.OnDeleteFile += Presenter.DeleteFile;
 
         WorkspaceForm.OnBuildProject += Presenter.BuildProject;
         WorkspaceForm.OnRunProject += Presenter.RunProject;
+        WorkspaceForm.OnCloseProject += Presenter.CloseProject;
 
         WorkspaceForm.OnSave += Presenter.Save;
 

@@ -16,7 +16,14 @@ using System.Threading.Tasks;
 using View.XMLParsing;
 
 namespace Framework.MVP;
+
+/// <summary>
+/// Defines an interface for models in the Model-View-Presenter architecture.
+/// </summary>
 public interface IModel
 {
+    /// <summary>
+    /// The current loaded project.
+    /// </summary>
     public Project? Project { get; set; }
 }

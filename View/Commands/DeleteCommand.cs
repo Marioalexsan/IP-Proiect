@@ -15,12 +15,25 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace View.Commands;
+
+/// <summary>
+/// Encapsulates a delete action.
+/// </summary>
 public class DeleteCommand : IEditorCommand
 {
+    /// <summary>
+    /// The starting position of the text deleted.
+    /// </summary>
     public int Position { get; set; }
 
+    /// <summary>
+    /// The text that was deleted.
+    /// </summary>
     public string DeletedString { get; set; } = "";
 
+    /// <summary>
+    /// The target RTB to modify when undoing or redoing.
+    /// </summary>
     public RichTextBox? Target { get; set; } = null;
 
     public void Redo()

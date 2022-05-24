@@ -23,10 +23,12 @@ namespace View.Forms
         public event EventHandler<CreateProjectArgs>? OnCreateProject;
         public event EventHandler<OpenProjectArgs>? OnOpenProject;
         public event EventHandler<CreateFileArgs>? OnCreateFile;
+        public event EventHandler<DeleteFileArgs>? OnDeleteFile;
         public event EventHandler? OnSave;
 
         public event EventHandler? OnBuildProject;
         public event EventHandler? OnRunProject;
+        public event EventHandler? OnCloseProject;
 
         public Dictionary<RichTextBox, FileInstance> InstanceMapping { get; } = new();
 
@@ -76,6 +78,28 @@ namespace View.Forms
             OnCreateFile?.Invoke(this, form.Result);
         }
 
+        private void DeleteFile_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Are you sure you want to delete this file?", "Delete File", MessageBoxButtons.YesNo);
+
+            if (result != DialogResult.Yes)
+                return;
+
+            foreach ((var box, var file) in InstanceMapping)
+            {
+                if (fileTabControl.SelectedTab.Controls.Contains(box))
+                {
+                    var args = new DeleteFileArgs()
+                    {
+                        Instance = InstanceMapping[box]
+                    };
+
+                    OnDeleteFile?.Invoke(this, args);
+                    return;
+                }
+            }
+        }
+
         private void ExitIDE_Click(object sender, EventArgs e)
         {
             Close();
@@ -84,12 +108,9 @@ namespace View.Forms
         public void UpdateProjectData(object? sender, Project? project)
         {
             addFileToolStripMenuItem.Enabled = project != null;
+            deleteFileToolStripMenuItem.Enabled = project != null;
+            closeProjectToolStripMenuItem.Enabled = project != null;
 
-            if (project == null)
-                return;
-
-            // Set current project
-            label1.Text = $"Current Project: {project.ProjectTitle}";
 
             // Delete all tabs
             foreach (var mapping in InstanceMapping)
@@ -99,8 +120,15 @@ namespace View.Forms
             InstanceMapping.Clear();
             PreviousText.Clear();
 
-
             fileTabControl.TabPages.Clear();
+
+            label1.Text = $"Current Project: None";
+
+            if (project == null)
+                return;
+
+            // Set current project
+            label1.Text = $"Current Project: {project.ProjectTitle}";
 
             // Insert new tabs
             foreach (var file in project.Files)
@@ -230,7 +258,6 @@ namespace View.Forms
         private void EditTimer_Tick(object sender, EventArgs e)
         {
             editTimer.Stop();
-            editTimer.Interval = 1000;
 
             Font validFont = new Font(FontFamily.GenericMonospace, 12, FontStyle.Regular);
             Font invalidFont = new Font(FontFamily.GenericMonospace, 12, FontStyle.Strikeout);
@@ -339,6 +366,7 @@ namespace View.Forms
         public void QueueSaving()
         {
             editTimer.Stop();
+            editTimer.Interval = 1000;
             editTimer.Start();
         }
 
@@ -355,10 +383,6 @@ namespace View.Forms
             box.Invalidate();
         }
 
-        [DllImport("User32.dll")]
-        private extern static int SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-
-        private const int WM_SETREDRAW = 0x0b;
         /// <summary>
         /// Callback to the undo button
         /// </summary>
@@ -415,16 +439,6 @@ namespace View.Forms
             QueueSaving();
         }
 
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
-
-        private void WorkspaceForm_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void RunProject_Click(object sender, EventArgs e)
         {
             OnRunProject?.Invoke(this, e);
@@ -433,6 +447,17 @@ namespace View.Forms
         private void BuildProject_Click(object sender, EventArgs e)
         {
             OnBuildProject?.Invoke(this, e);
+        }
+
+        [DllImport("User32.dll")]
+        private extern static int SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        private const int WM_SETREDRAW = 0x0b;
+
+        private void CloseProject_Click(object sender, EventArgs e)
+        {
+            SaveNow();
+            OnCloseProject?.Invoke(this, e);
         }
     }
 }

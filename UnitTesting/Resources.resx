@@ -139,9 +139,6 @@ int main()
     // String and character literal
     cout &lt;&lt; "Hello World" &lt;&lt;'!' &lt;&lt; '\n';
 
-    // Invalid character literals
-    cout &lt;&lt; '!!' &lt;&lt; '\\n' &lt;&lt; '';
-    
     // Some integer literals
     cout &lt;&lt; 123    &lt;&lt; '\n'
          &lt;&lt; 0123   &lt;&lt; '\n'

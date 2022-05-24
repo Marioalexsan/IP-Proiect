@@ -14,8 +14,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Framework.Data;
+
 /// <summary>
-/// Retains data, as path and content, about the file to be created
+/// Contains the state of an open editor file.
 /// </summary>
 public class FileInstance
 {

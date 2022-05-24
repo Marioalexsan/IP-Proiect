@@ -34,25 +34,23 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closeProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fileTabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.editTimer = new System.Windows.Forms.Timer(this.components);
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.buildButton = new System.Windows.Forms.Button();
+            this.runButton = new System.Windows.Forms.Button();
             this.Redo = new System.Windows.Forms.Button();
             this.Undo = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.runButton = new System.Windows.Forms.Button();
-            this.buildButton = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.fileTabControl.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -70,14 +68,15 @@
             this.menuStrip1.Size = new System.Drawing.Size(800, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
-            this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
             // 
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newProjectToolStripMenuItem,
             this.openProjectToolStripMenuItem,
+            this.closeProjectToolStripMenuItem,
             this.addFileToolStripMenuItem,
+            this.deleteFileToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -97,6 +96,14 @@
             this.openProjectToolStripMenuItem.Text = "Open Project";
             this.openProjectToolStripMenuItem.Click += new System.EventHandler(this.OpenProject_Click);
             // 
+            // closeProjectToolStripMenuItem
+            // 
+            this.closeProjectToolStripMenuItem.Enabled = false;
+            this.closeProjectToolStripMenuItem.Name = "closeProjectToolStripMenuItem";
+            this.closeProjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.closeProjectToolStripMenuItem.Text = "Close Project";
+            this.closeProjectToolStripMenuItem.Click += new System.EventHandler(this.CloseProject_Click);
+            // 
             // addFileToolStripMenuItem
             // 
             this.addFileToolStripMenuItem.Enabled = false;
@@ -104,6 +111,14 @@
             this.addFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addFileToolStripMenuItem.Text = "Add File";
             this.addFileToolStripMenuItem.Click += new System.EventHandler(this.NewFile_Click);
+            // 
+            // deleteFileToolStripMenuItem
+            // 
+            this.deleteFileToolStripMenuItem.Enabled = false;
+            this.deleteFileToolStripMenuItem.Name = "deleteFileToolStripMenuItem";
+            this.deleteFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteFileToolStripMenuItem.Text = "Delete File";
+            this.deleteFileToolStripMenuItem.Click += new System.EventHandler(this.DeleteFile_Click);
             // 
             // exitToolStripMenuItem
             // 
@@ -116,11 +131,7 @@
             // 
             this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.undoToolStripMenuItem,
-            this.redoToolStripMenuItem,
-            this.cutToolStripMenuItem,
-            this.copyToolStripMenuItem,
-            this.pasteToolStripMenuItem,
-            this.selectAllToolStripMenuItem});
+            this.redoToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
@@ -136,30 +147,6 @@
             this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
             this.redoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.redoToolStripMenuItem.Text = "Redo";
-            // 
-            // cutToolStripMenuItem
-            // 
-            this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
-            this.cutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.cutToolStripMenuItem.Text = "Cut";
-            // 
-            // copyToolStripMenuItem
-            // 
-            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.copyToolStripMenuItem.Text = "Copy";
-            // 
-            // pasteToolStripMenuItem
-            // 
-            this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.pasteToolStripMenuItem.Text = "Paste";
-            // 
-            // selectAllToolStripMenuItem
-            // 
-            this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.selectAllToolStripMenuItem.Text = "Select All";
             // 
             // fileTabControl
             // 
@@ -210,6 +197,26 @@
             this.panel1.Size = new System.Drawing.Size(800, 59);
             this.panel1.TabIndex = 4;
             // 
+            // buildButton
+            // 
+            this.buildButton.Location = new System.Drawing.Point(80, 24);
+            this.buildButton.Name = "buildButton";
+            this.buildButton.Size = new System.Drawing.Size(75, 23);
+            this.buildButton.TabIndex = 6;
+            this.buildButton.Text = "Build";
+            this.buildButton.UseVisualStyleBackColor = true;
+            this.buildButton.Click += new System.EventHandler(this.BuildProject_Click);
+            // 
+            // runButton
+            // 
+            this.runButton.Location = new System.Drawing.Point(161, 24);
+            this.runButton.Name = "runButton";
+            this.runButton.Size = new System.Drawing.Size(75, 23);
+            this.runButton.TabIndex = 5;
+            this.runButton.Text = "Run";
+            this.runButton.UseVisualStyleBackColor = true;
+            this.runButton.Click += new System.EventHandler(this.RunProject_Click);
+            // 
             // Redo
             // 
             this.Redo.Image = ((System.Drawing.Image)(resources.GetObject("Redo.Image")));
@@ -241,26 +248,6 @@
             this.panel2.Size = new System.Drawing.Size(800, 367);
             this.panel2.TabIndex = 5;
             // 
-            // runButton
-            // 
-            this.runButton.Location = new System.Drawing.Point(161, 24);
-            this.runButton.Name = "runButton";
-            this.runButton.Size = new System.Drawing.Size(75, 23);
-            this.runButton.TabIndex = 5;
-            this.runButton.Text = "Run";
-            this.runButton.UseVisualStyleBackColor = true;
-            this.runButton.Click += new System.EventHandler(this.RunProject_Click);
-            // 
-            // buildButton
-            // 
-            this.buildButton.Location = new System.Drawing.Point(80, 24);
-            this.buildButton.Name = "buildButton";
-            this.buildButton.Size = new System.Drawing.Size(75, 23);
-            this.buildButton.TabIndex = 6;
-            this.buildButton.Text = "Build";
-            this.buildButton.UseVisualStyleBackColor = true;
-            this.buildButton.Click += new System.EventHandler(this.BuildProject_Click);
-            // 
             // WorkspaceForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -272,7 +259,6 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "WorkspaceForm";
             this.Text = "WorkspaceForm";
-            this.Load += new System.EventHandler(this.WorkspaceForm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.fileTabControl.ResumeLayout(false);
@@ -294,10 +280,6 @@
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem cutToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
         private System.Windows.Forms.TabControl fileTabControl;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.ToolStripMenuItem addFileToolStripMenuItem;
@@ -309,5 +291,7 @@
         private Button Undo;
         private Button runButton;
         private Button buildButton;
+        private ToolStripMenuItem deleteFileToolStripMenuItem;
+        private ToolStripMenuItem closeProjectToolStripMenuItem;
     }
 }

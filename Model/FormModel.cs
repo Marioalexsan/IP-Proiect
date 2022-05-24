@@ -17,6 +17,10 @@ using System.Threading.Tasks;
 using View.XMLParsing;
 
 namespace Model;
+
+/// <summary>
+/// Concrete implementation of the IModel interface.
+/// </summary>
 public class FormModel : IModel
 {
     public Project? Project { get; set; }

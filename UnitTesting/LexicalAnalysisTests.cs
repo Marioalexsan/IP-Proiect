@@ -13,6 +13,9 @@ using System.Linq;
 
 namespace UnitTesting;
 
+/// <summary>
+/// Tests for the LexicalAnalysis class.
+/// </summary>
 [TestClass]
 public class LexicalAnalysisTests
 {

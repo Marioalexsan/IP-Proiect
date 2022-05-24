@@ -15,12 +15,25 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace View.Commands;
+
+/// <summary>
+/// Encapsulates a write action.
+/// </summary>
 public class WriteCommand : IEditorCommand
 {
+    /// <summary>
+    /// The starting position of the text written.
+    /// </summary>
     public int Position { get; set; }
 
+    /// <summary>
+    /// The text that was written.
+    /// </summary>
     public string WrittenString { get; set; } = "";
 
+    /// <summary>
+    /// The target RTB to modify when undoing or redoing.
+    /// </summary>
     public RichTextBox? Target { get; set; } = null;
 
     public void Redo()

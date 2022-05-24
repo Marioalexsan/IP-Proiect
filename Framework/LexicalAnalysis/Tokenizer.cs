@@ -58,6 +58,9 @@ public static class Tokenizer
         return tokenList;
     }
 
+    /// <summary>
+    /// Converts the whitespace from the source into a token.
+    /// </summary>
     public static Token? ConsumeWhiteSpace(ReadOnlySpan<char> source)
     {
         if (source.Length == 0)
@@ -73,6 +76,9 @@ public static class Tokenizer
         return new Token(TokenTypes.WhiteSpace, null, index);
     }
 
+    /// <summary>
+    /// Checks if the source is a boolean literal and returns a token if successful, null otherwise.
+    /// </summary>
     public static Token? CheckBooleanLiteral(ReadOnlySpan<char> source)
     {
         if (source != "true" && source != "false")
@@ -81,6 +87,9 @@ public static class Tokenizer
         return new Token(TokenTypes.BooleanLiteral, source[0] == 't', source.Length);
     }
 
+    /// <summary>
+    /// Checks if the source is a point literal and returns a token if successful, null otherwise.
+    /// </summary>
     public static Token? CheckPointerLiteral(ReadOnlySpan<char> source)
     {
         if (source != "nullptr")
@@ -89,6 +98,9 @@ public static class Tokenizer
         return new Token(TokenTypes.PointerLiteral, null, source.Length);
     }
 
+    /// <summary>
+    /// Checks if the source is a string literal and returns a token if successful, null otherwise.
+    /// </summary>
     public static Token? CheckStringLiteral(ReadOnlySpan<char> source)
     {
         if (source.Length <= 1 || source[0] != '"')
@@ -109,6 +121,9 @@ public static class Tokenizer
         return new Token(TokenTypes.StringLiteral, source[1..index].ToString(), index + 1, index < source.Length);
     }
 
+    /// <summary>
+    /// Checks if the source is a character literal and returns a token if successful, null otherwise.
+    /// </summary>
     public static Token? CheckCharacterLiteral(ReadOnlySpan<char> source)
     {
         if (source.Length <= 1 || source[0] != '\'')
@@ -131,6 +146,9 @@ public static class Tokenizer
         return new Token(TokenTypes.CharacterLiteral, source[1], index + 1, characterCount == 1 && index < source.Length);
     }
 
+    /// <summary>
+    /// Checks if the source is a float literal and returns a token if successful, null otherwise.
+    /// </summary>
     public static Token? CheckFloatLiteral(ReadOnlySpan<char> source)
     {
         bool erroneous = false;
@@ -330,6 +348,9 @@ public static class Tokenizer
         }
     }
 
+    /// <summary>
+    /// Checks if the source is an integer literal and returns a token if successful, null otherwise.
+    /// </summary>
     public static Token? CheckIntegerLiteral(ReadOnlySpan<char> source)
     {
         bool erroneous = false;
@@ -433,6 +454,9 @@ public static class Tokenizer
         return new Token(TokenTypes.Invalid, source[..index].ToString(), index);
     }
 
+    /// <summary>
+    /// Checks if the source is an identifier and returns a token if successful, null otherwise.
+    /// </summary>
     public static Token? CheckIdentifier(ReadOnlySpan<char> source)
     {
         if (source.Length == 0 || char.IsDigit(source[0]) || !CppStuff.IsIdentifierCharacter(source[0]))
@@ -448,6 +472,9 @@ public static class Tokenizer
         return new Token(TokenTypes.Identifier, source[..index].ToString(), index);
     }
 
+    /// <summary>
+    /// Checks if the source is a comment and returns a token if successful, null otherwise.
+    /// </summary>
     public static Token? CheckComment(ReadOnlySpan<char> source)
     {
         int end = 2;
@@ -491,6 +518,9 @@ public static class Tokenizer
         return null;
     }
 
+    /// <summary>
+    /// Checks if the source is a punctuator and returns a token if successful, null otherwise.
+    /// </summary>
     public static Token? CheckPunctuator(ReadOnlySpan<char> source)
     {
         // Try for max length
@@ -510,6 +540,9 @@ public static class Tokenizer
         return token;
     }
 
+    /// <summary>
+    /// Checks if the source is a keyword and returns a token if successful, null otherwise.
+    /// </summary>
     public static Token? CheckKeyword(ReadOnlySpan<char> source)
     {
         // Try for max length
@@ -519,7 +552,7 @@ public static class Tokenizer
 
         foreach (var keyword in CppStuff.Keywords)
         {
-            if (source.StartsWith(keyword) && maxLength < keyword.Length)
+            if (source.StartsWith(keyword) && (source.Length <= keyword.Length || !char.IsLetterOrDigit(source[keyword.Length])) && maxLength < keyword.Length)
             {
                 token = new Token(TokenTypes.Keyword, source[..keyword.Length].ToString(), keyword.Length);
                 maxLength = token.Length;

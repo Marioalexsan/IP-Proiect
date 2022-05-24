@@ -15,6 +15,10 @@ using Framework.MVP;
 using Model;
 using Presenter;
 
+
+/// <summary>
+/// The entry point of the application.
+/// </summary>
 namespace NaNtaEditor
 {
     internal static class Program

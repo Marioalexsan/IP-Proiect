@@ -82,12 +82,12 @@ namespace UnitTesting {
         ///    // String and character literal
         ///    cout &lt;&lt; &quot;Hello World&quot; &lt;&lt;&apos;!&apos; &lt;&lt; &apos;\n&apos;;
         ///
-        ///    // Invalid character literals
-        ///    cout &lt;&lt; &apos;!!&apos; &lt;&lt; &apos;\\n&apos; &lt;&lt; &apos;&apos;;
-        ///    
         ///    // Some integer literals
         ///    cout &lt;&lt; 123    &lt;&lt; &apos;\n&apos;
-        ///         &lt;&lt;  [rest of string was truncated]&quot;;.
+        ///         &lt;&lt; 0123   &lt;&lt; &apos;\n&apos;
+        ///         &lt;&lt; 0x123  &lt;&lt; &apos;\n&apos;
+        ///         &lt;&lt; 0b10   &lt;&lt; &apos;\n&apos;
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string lexicalAnalysisSampleSource1 {
             get {

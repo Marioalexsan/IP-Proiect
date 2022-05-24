@@ -31,6 +31,7 @@ public partial class NewFileForm : Form
     {
         InitializeComponent();
     }
+
     /// <summary>
     /// Get the location where the new file will be stored.
     /// </summary>

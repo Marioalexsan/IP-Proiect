@@ -7,6 +7,7 @@
 *
 ===========================================================*/
 
+using Framework.Compilation;
 using Framework.MVP;
 using Model;
 using System;
@@ -18,9 +19,13 @@ using System.Threading.Tasks;
 using View.XMLParsing;
 
 namespace Presenter;
+
+/// <summary>
+/// Concrete implementation of the IPresenter interface.
+/// </summary>
 public class FormPresenter : IPresenter
 {
-    private Compiler.Compiler Compiler = new Compiler.Compiler();
+    private Compiler Compiler = new Compiler();
 
     private IModel? _model;
     public IModel Model
@@ -73,9 +78,12 @@ public class FormPresenter : IPresenter
         ProjectUpdated?.Invoke(this, Model.Project);
     }
 
-    public void OpenFile(object? sender, OpenFileArgs e)
+    public void CloseProject(object? sender, EventArgs e)
     {
+        Model.Project?.SaveXML();
+        Model.Project = null;
 
+        ProjectUpdated?.Invoke(this, Model.Project);
     }
 
     public void CreateFile(object? sender, CreateFileArgs e)
@@ -84,6 +92,16 @@ public class FormPresenter : IPresenter
             return;
 
         Model.Project.AddFileToProject(e.Name, e.FolderPath);
+
+        ProjectUpdated?.Invoke(this, Model.Project);
+    }
+
+    public void DeleteFile(object? sender, DeleteFileArgs e)
+    {
+        if (Model.Project == null || e.Instance == null)
+            return;
+
+        Model.Project.RemoveFileFromProject(e.Instance);
 
         ProjectUpdated?.Invoke(this, Model.Project);
     }
@@ -101,7 +119,12 @@ public class FormPresenter : IPresenter
             return;
         }
 
-        Compiler.BuildFiles(Model.Project.Files.Select(x => x.FilePath).ToList(), "");
+        Compiler.BuildFiles(new CompileOptions()
+        {
+            AbsoluteFilePaths = Model.Project.Files.Select(x => x.FilePath).Where(path => !path.EndsWith(".h")).ToList(),
+            CommandLineArguments = "",
+            OutputName = Model.Project.ProjectTitle
+        });
 
         View.ShowMessage("Build Status: \n\n\n" + Compiler.StatusText);
     }
@@ -114,9 +137,9 @@ public class FormPresenter : IPresenter
             return;
         }
 
-        Compiler.RunFileInTerminal(new Compiler.CompileOptions()
+        Compiler.RunFileInTerminal(new CompileOptions()
         {
-            AbsoluteFilePaths = Model.Project.Files.Select(x => x.FilePath).ToList(),
+            AbsoluteFilePaths = Model.Project.Files.Select(x => x.FilePath).Where(path => !path.EndsWith(".h")).ToList(),
             CommandLineArguments = "",
             OutputName = Model.Project.ProjectTitle
         });
