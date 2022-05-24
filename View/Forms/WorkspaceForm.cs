@@ -226,9 +226,6 @@ namespace View.Forms
                         DeletedString = oldText.Substring(beginLen, unmatchedOld),
                         Target = box
                     });
-
-                    Debug.WriteLine("New delete:");
-                    Debug.WriteLine("---" + oldText.Substring(beginLen, unmatchedOld) + "---");
                 }
 
                 // Try for a Write Command
@@ -240,14 +237,7 @@ namespace View.Forms
                         WrittenString = newText.Substring(beginLen, unmatchedNew),
                         Target = box
                     });
-
-                    Debug.WriteLine("New writer:");
-                    Debug.WriteLine("---" + newText.Substring(beginLen, unmatchedNew) + "---");
                 }
-
-                Debug.WriteLine("===============");
-                Debug.WriteLine("Current Undoables: " + file.Memento.UndoableCount);
-                Debug.WriteLine("Current Redoables: " + file.Memento.RedoableCount);
             }
 
             PreviousText[box] = box.Text;

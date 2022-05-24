@@ -1,7 +1,7 @@
 ﻿/*============================================================
 *
 * File:     FormPresenter.cs
-* Authors:  Damian Gabriel-Mihai, Florea Alexandru-Daniel
+* Authors:  Damian Gabriel-Mihai
 * Purpose:  Defines the DeleteCommand editor action.
 *
 ===========================================================*/
