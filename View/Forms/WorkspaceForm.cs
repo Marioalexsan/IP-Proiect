@@ -459,5 +459,10 @@ namespace View.Forms
             SaveNow();
             OnCloseProject?.Invoke(this, e);
         }
+
+        private void Help_Click(object sender, EventArgs e)
+        {
+            Help.ShowHelp(this, @"Resources/NaNTa.chm");
+        }
     }
 }

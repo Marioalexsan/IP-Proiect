@@ -23,4 +23,10 @@
     <ProjectReference Include="..\Presenter\Presenter.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\NaNTa.chm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
